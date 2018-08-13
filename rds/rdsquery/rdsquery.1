@@ -1,0 +1,128 @@
+.TH "rdsquery" "1" "0.1.0" "Hans J. Koch" "Radio Data System data query program"
+.SH "NAME"
+.LP 
+rdsquery \- commandline tool to query data from a Radio Data System
+daemon (rdsd).
+
+This is a preliminary man page for the pre\-Alpha
+development version of rdsquery. Not everything described
+in here necessarily works yet! Parameters might change
+before rdsquery becomes stable.
+.SH "SYNTAX"
+.LP 
+rdsquery [\fIoptions\fP]
+
+.SH "DESCRIPTION"
+.LP 
+rdsquery is a client application to read decoded
+Radio Data System (RDS) data from a RDS daemon (rdsd).
+It connects to rdsd via TCP/IP or a unix domain socket.
+.LP 
+rdsquery uses librds for the lowlevel communication routines
+and therefore depends on the librds package.
+
+.SH "OPTIONS"
+.LP 
+.TP 
+\fB\-c\fR <\fInum\fP>
+The number of data records rdsquery should retrieve. If
+<\fInum\fP> is 0, rdsquery runs in continous mode
+and has to be killed externally, e.g. by typing Ctrl\-C.
+The default is \-c 1, so if you don't give this option, one
+value of each type will be fetched before rdsquery terminates.
+.TP 
+\fB\-s\fR <\fIserver\fP>
+Connect to rdsd running on <\fIserver\fP> using TCP/IP.
+<\fIserver\fP> can either be an IP address like 192.168.1.1 
+or a hostname your system is able to resolve.
+.TP 
+\fB\-p\fR <\fIport\fP>
+If your rdsd is not running on its default port 4321, you have to 
+specify the port with this option.
+.TP 
+\fB\-u\fR <\fIsocketname\fP>
+Connect to rdsd running on the same computer using an unix domain socket.
+.TP 
+\fB\-e\fR
+Get the list of sources rdsd knows about. To select a certain source,
+use the \-n option.
+.TP 
+\fB\-n\fR <\fInum\fP>
+The number of the source from which data should be retrieved. Numbering
+starts from 0, you can get a list of sources known by rdsd using
+the \-e option. If you don't give this option, 0 is assumed.
+.TP 
+\fB\-t\fR <\fItype1,type2,...\fP>
+The list of data types that rdsquery should retrieve. Possible types are:
+.IP 
+\fBrflags\fR: Some bitwise coded flags. See librds.h for details.
+.IP 
+\fBpicode\fR: The Program Identifiction code.
+.IP 
+\fBptype\fR: Program type number.
+.IP 
+\fBpname\fR: Program name.
+.IP 
+\fBlocdt\fR: Local date and time.
+.IP 
+\fButcdt\fR: UTC date and time.
+.IP 
+\fBrtxt\fR: Current radio text buffer.
+.IP 
+\fBlrtxt\fR: Last radio text. The last completely received radio text
+string. This is usually what you want if you want to read radio text.
+.IP 
+\fBtmc\fR: TMC (Traffic Message Channel) message list (numerical).
+.IP 
+\fBaflist\fR: List of alternative frequencies.
+.IP 
+\fBgstat\fR: Statistics about received RDS groups.
+
+.TP 
+\fB\-h\fR
+Output some help text.
+.TP 
+\fB\-v\fR
+Output version information and exit.
+.SH "FILES"
+.LP 
+None, rdsquery is solely configured through commandline options.
+
+.SH "EXAMPLES"
+.LP 
+Get a list of sources rdsd knows about. Connect to rdsd
+running on the local computer using an unix domain socket
+with the default parameters. This can also be used as a
+quick test if rdsd is up and running:
+.LP 
+rdsquery \-e
+.LP 
+Display the last complete radio text string. The connection
+is made with TCP/IP, using the default port:
+.LP 
+rdsquery \-s 192.168.1.1 \-t lrtxt
+.LP 
+Display radio text strings continously until stopped with
+Ctrl\-C: 
+.LP 
+rdsquery \-c 0 \-s 192.168.1.1 \-t lrtxt
+.LP 
+Get TMC data from the second source on the local computer:
+.LP 
+rdsquery \-n 1 \-t tmc
+.LP 
+Retrieve the last date/time information. Note that this
+is transmitted only every full minute. You can ask for two
+timestamps to make sure the second one was received on the
+full minute (hh:mm:00). Replace utcdt by locdt to get local
+date/time:
+.LP 
+rdsquery \-c 2 \-s 192.168.1.1 \-t utcdt
+
+
+.SH "AUTHORS"
+.LP 
+Hans J. Koch <hjkoch@users.berlios.de>
+.LP 
+Project homepage: http://rdsd.berlios.de
+

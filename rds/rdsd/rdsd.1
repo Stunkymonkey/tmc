@@ -1,0 +1,182 @@
+.TH "rdsd" "1" "0.0.1" "Hans J. Koch" "Radio Data System daemon"
+.SH "NAME"
+.LP 
+rdsd \- Radio Data System daemon
+
+This is a preliminary man page for the pre\-Alpha
+development version of rdsd. Not everything described
+in here necessarily works yet! Parameters might change
+before rdsd becomes stable.
+.SH "SYNTAX"
+.LP 
+rdsd [\fIoptions\fP]
+
+.SH "DESCRIPTION"
+.LP 
+rdsd is a program to read and decode Radio Data System (RDS)
+data from one or more input sources. Clients can connect to
+rdsd via TCP/IP or a unix domain socket.
+.LP 
+rdsd can run as a normal console program or as a daemon, the 
+latter being the standard mode of operation. Only one instance
+of rdsd can run at a time.
+.LP 
+rdsd reads its configuration from a configuration file, default
+is /etc/rdsd.conf. Only a few options can be given on the command
+line.
+.SH "OPTIONS"
+.LP 
+.TP 
+\fB\-c\fR <\fIfilename\fP>
+Read configuration from <\fIfilename\fP> instead
+of the default /etc/rdsd.conf
+.TP 
+\fB\-d\fR
+Run as a daemon in the background. If you don't give this
+option, rdsd won't fork.
+.TP 
+\fB\-h\fR
+Output help information and exit.
+.TP 
+\fB\-v\fR
+Output version information and exit.
+.SH "CONFIGURATION FILE"
+.LP 
+A configuration file for rdsd consists of
+sections containing name=value pairs.
+
+The file normally has a [global] section and
+one or more [source] sections.
+
+An example file showing all options looks
+like this:
+
+.IP 
+.nf 
+[global]
+unix\-socket = "/var/tmp/rdsd.sock"
+tcpip\-port = 4321
+logfile = "/var/tmp/rdsd.log"
+pidfile = "/var/tmp/rdsd.pid"
+console\-log = yes
+file\-log = yes
+loglevel = 5
+
+[source]
+name = "Terratec PCI card"
+path = "/dev/radio0"
+type = "radiodev"
+getradiofreq = true
+tunerfreq = 93800
+
+[source]
+name = "Test data file"
+path = "/home/hans/develop/testdata.rds"
+type = "file"
+ 
+[source]
+name = "SAA6588 via i2c"
+path = "/dev/i2c\-0"
+type = "i2cdev"
+.fi 
+
+.LP 
+Parameters in [global] section:
+
+.TP 
+\fBunix\-socket\fR
+The unix domain socket where rdsd should accept connections.
+.TP 
+\fBtcpip\-port\fR
+The TCP/IP port rdsd listens on.
+.TP 
+\fBlogfile\fR
+Name of a logfile to use.
+.TP 
+\fBpidfile\fR
+Name of a file where rdsd stores its pid.
+.TP 
+\fBconsole\-log\fR
+Boolean value, if set to yes (or 1), rdsd will output log
+messages on the console as long as this is possible (before
+entering daemon mode).
+.TP 
+\fBfile\-log\fR
+Boolean value, if set to yes (or 1), rdsd will output log messages
+to the file named above.
+.TP 
+\fBloglevel\fR
+Integer value (0..5), the higher the value, the more information
+is given. When loglevel is 0, only emergency situations are reported.
+
+.LP 
+Parameters in [source] section:
+
+.TP 
+\fBname\fR
+Name of the source. This will be name reported by the esrc (enum sources)
+command. It should be a descriptive string that can be presented to a
+user. If it contains blanks, it should be enclosed by double quotes.
+
+.TP 
+\fBpath\fR
+A valid path. The kind of file (regular or device) expected depends on
+the type parameter.
+
+.TP 
+\fBtype\fR
+One of radiodev | i2cdev | file. "file" and "i2cdev" are mainly for
+development and debugging purposes. If type is radiodev, path should be a
+valid V4L radio device (e.g. "/dev/radio0"). If type is "file", path must be
+the name of a file containing raw RDS data. This data has to be in the same
+format as the data read from /dev/radio. The type "i2cdev" was supposed to 
+read data from a SAA6588 directly via I2C. This is deprecated now and will
+probably go away soon. If you need such a feature, post a message on the
+rdsd\-devel mailing list. 
+
+.TP 
+\fBtunerfreq\fR
+If the type of the source is "radiodev", rdsd can tune your radio to the 
+frequency given here. This is done once at startup. The frequency is given in
+kHz. If you don't specify tunerfreq, rdsd won't touch the radio tuner. In that
+case you need some external application to tune your radio.
+
+.TP
+\fBgetradiofreq\fR
+If false, prevents rdsd from constantly polling the radio device for its current
+frequency, which causes audible clicks in the audio of some radios.
+
+.SH "PROTOCOL"
+.LP 
+Normally there is no need to deal with the protocol
+that rdsd uses for its socket connections. The user
+library librds handles that for you.
+
+(TODO: Add brief protocol description here...)
+.SH "FILES"
+.LP 
+\fI/etc/rdsd.conf\fP 
+.br 
+\fI/var/run/rdsd.pid\fP 
+.SH "EXAMPLES"
+.LP 
+To run rdsd as a daemon, you will usually setup /etc/rdsd.conf,
+and then simply start the program with
+.LP 
+rdsd \-d
+.LP 
+For debugging purposes it is sometimes helpful if rdsd doesn't
+put itself in the background. You can achieve this by omitting
+the \-d option. This allows you to see debug messages in your 
+console window. For experiments, you might also want to
+use a configuration file in your home directory instead of 
+/etc/rdsd.conf. The following command does all this:
+.LP 
+rdsd \-c /home/hans/mytest.conf
+
+.SH "AUTHORS"
+.LP 
+Hans J. Koch <hjkoch@users.berlios.de>
+.LP 
+Project homepage: http://rdsd.berlios.de
+

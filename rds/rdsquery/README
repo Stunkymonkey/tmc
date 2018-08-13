@@ -1,0 +1,180 @@
+rdsquery - client for the Radio Data System daemon rdsd
+=======================================================
+
+Author: Hans J. Koch <hjkoch@users.berlios.de>
+Homepage: http://rdsd.berlios.de
+
+What is it?
+===========
+
+The Radio Data System daemon rdsd reads raw RDS data from a 
+Video4Linux radio device. It decodes this data and acts as a
+server for the results.
+
+Clients can connect to an rdsd server in two ways:
+* Via TCP/IP: rdsd listens on port 4321 by default. Server 
+  and client(s) can be on different machines in a network.
+* Via Unix domain socket: rdsd listens on /var/tmp/rdsd.sock
+  by default. Server and client(s) have to be on the same 
+  machine. This is usually faster and uses less resources than
+  TCP/IP.
+
+There is a library called librds to handle all the network 
+and protocol stuff. The command line client rdsquery uses
+librds.
+
+Installation
+============
+
+(see also INSTALL files in the sources)
+
+If you compile rdsquery from sources, you need to install
+librds first. The header file librds.h has to be available
+at compile time. At run time, librds.so must be in a location
+where your system's linker (ld) can find it.
+
+Test
+====
+
+To get an overview, have a look at the man page (man rdsquery).
+A short help is available by typing rdsquery -h.
+
+For a first test, run rdsquery on the same machine as rdsd.
+You can then type
+
+rdsquery -e
+
+This should show you the numbers and names of the sources you
+configured in rdsd.conf, if this doesn't work, rdsd is not running
+or not configured properly. If you changed the default path for
+the unix socket, you must specify it:
+
+rdsquery -u /path/to/socket -e
+
+You can also try it via TCP/IP (using default port 4321):
+
+rdsquery -s localhost -e
+
+If you are running rdsd on a different port, specify it with -p:
+
+rdsquery -s servername -p 1234 -e
+
+In the following examples, I assume you are running rdsquery on
+the machine where rdsd is running.
+
+Get the tuner frequency of the radio device:
+
+rdsquery -f 0
+
+This assumes we're talking about source #0. If you have more than
+one radio cards configured in rdsd.conf, specify the source with
+the -n option:
+
+rdsquery -n 1 -f 0
+
+will show you the frequency of the second source. You can also tune
+to a different frequency by giving the frequency in kHz:
+
+rdsquery -f 93800
+
+will tune source #0 to 93.8 MHz.
+
+All other data is queried using the -t option. To find out the 
+current program name, type
+
+rdsquery -t pname
+
+This will wait for the next complete program name, display it,
+and exit. If you want more than one data record, use the -c option:
+
+rdsquery -c 5 -t pname
+
+will display the next 5 program names. Specifying -c 0 makes
+rdsquery loop endlessly, you have to stop it e.g. by typing STRG+C.
+
+You can specify several data types (comma separated):
+
+rdsquery -c 0 -t lrtxt,locdt
+
+will show you radio text and local date/time until you stop it
+by typing STRG+C. Possible types are:
+
+rxfre  : tuner frequency
+rxsig  : signal strength
+rflags : Some flags (like stereo/mono), see librds.h for details
+picode : Program Identification code
+ptype  : Program Type identifier
+pname  : Program Name
+locdt  : local date/time
+utcdt  : UTC date/time
+rtxt   : Current radio text buffer
+lrtxt  : Last complete radio text string
+tmc    : Traffic Message Channel message list (numerical, experimental)
+aflist : List of alternative frequencies
+gstat  : RDS group statistics
+
+The group statistics option gives you a good overview about what 
+information your station transmits and how good reception quality is.
+Here's an example output for a weak, but usable station received via a
+simple antenna:
+
+# rdsquery -t gstat
+gstat:
+0A 25284 4050
+0B 10 2
+1A 1 1
+1B 7 5
+2A 12492 2322
+2B 1 1
+3A 1749 261
+3B 5 1
+4A 137 26
+4B 2 0
+5A 0 0
+5B 0 0
+6A 6562 855
+6B 3 0
+7A 1 0
+7B 0 3
+8A 5312 830
+8B 1 3
+9A 6 0
+9B 1 0
+10A 2 3
+10B 2 1
+11A 2 2
+11B 2 1
+12A 9 7
+12B 1 0
+13A 2 0
+13B 0 0
+14A 12897 2074
+14B 1 1
+15A 3 0
+15B 68 9
+??? 0 13848
+
+The first column is the group type, the second column shows the 
+number of usable groups, the third the number of erroneous groups.
+Some information you can extract from this list:
+* More than 10% of the groups have errors. This is still good.
+* Radio text is sent with 64 characters using 2A groups.
+* There is TMC data (8A groups)
+* The station supports EON (group 14A)
+* The station sends date/time information each minute (groups 4A)
+
+If you want to understand this better, have a look at RDS specifications,
+you'll find a link at http://rdsd.berlios.de
+
+If you have questions, please join the rdsd-devel mailing list (see
+homepage for details). Try to avoid asking me by privat mail. Your 
+chances to get a fast response are much better on the mailing list,
+and others will learn from your questions, too. That's how open source
+development works.
+
+29.12.2005
+Hans J. Koch 
+
+
+
+

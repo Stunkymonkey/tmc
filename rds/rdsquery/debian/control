@@ -1,0 +1,15 @@
+Source: rdsd
+Section: misc
+Priority: extra
+Maintainer: Hans J. Koch <hjkoch@users.berlios.de>
+Build-Depends: debhelper (>= 7.0.15)
+Standards-Version: 3.7.3
+Vcs-Svn: svn://svn.berlios.de/rdsd/trunk/
+Vcs-Browser: http://svn.berlios.de/viewsvn/rdsd/trunk/
+Homepage: http://rdsd.berlios.de
+
+Package: rdsquery
+Depends: librds
+Architecture: any
+Description: RDS query tool
+ This package contains the RDS query tool.

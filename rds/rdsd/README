@@ -1,0 +1,91 @@
+rdsd - Radio Data System daemon
+===============================
+
+Author: Hans J. Koch <hjkoch@users.berlios.de>
+Homepage: http://rdsd.berlios.de
+
+What is it?
+===========
+
+The Radio Data System daemon rdsd reads raw RDS data from a 
+Video4Linux radio device. It decodes this data and acts as a
+server for the results.
+
+Clients can connect to an rdsd server in two ways:
+* Via TCP/IP: rdsd listens on port 4321 by default. Server 
+  and client(s) can be on different machines in a network.
+* Via Unix domain socket: rdsd listens on /var/tmp/rdsd.sock
+  by default. Server and client(s) have to be on the same 
+  machine. This is usually faster and uses less resources than
+  TCP/IP.
+
+There is a library called librds to handle all the network 
+and protocol stuff. The command line client rdsquery uses
+librds.
+
+Installation
+============
+
+(see also INSTALL files in the sources)
+
+If you compile rdsd from sources, you need to install
+librds first. The header file librds.h has to be available
+at compile time. At run time, librds.so is NOT needed by
+rdsd at the moment. This might change in the future.
+If you install rdsquery or an other client application,
+you will probably have to install librds anyway.
+
+Test
+====
+
+You can use rdsquery for testing rdsd. See the README
+file in the rdsquery sources for more details.
+
+For a low level test, you can also directly connect to
+rdsd using telnet:
+
+# telnet localhost 4321
+
+should work as soon as rdsd is running. You can then
+get the list of sources you configured in /etc/rdsd.conf
+by typing:
+
+esrc
+
+After pressing Return, rdsd should send its source list.
+
+If this works, you can ask for data by typing
+<source number>:<data type>, for example:
+
+0:pname
+
+This should display the program name of the tuned 
+station of your first source. Other data types you 
+could try include:
+
+rxfre  : tuner frequency
+rxsig  : signal strength
+rflags : Some flags (like stereo/mono), see librds.h for details
+picode : Program Identification code
+ptype  : Program Type identifier
+pname  : Program Name
+locdt  : local date/time
+utcdt  : UTC date/time
+rtxt   : Current radio text buffer
+lrtxt  : Last complete radio text string
+tmc    : Traffic Message Channel message list (numerical, experimental)
+aflist : List of alternative frequencies
+gstat  : RDS group statistics
+
+If you have questions, please join the rdsd-devel mailing list (see
+homepage for details). Try to avoid asking me by privat mail. Your 
+chances to get a fast response are much better on the mailing list,
+and others will learn from your questions, too. That's how open source
+development works.
+
+29.12.2005
+Hans J. Koch 
+
+
+
+

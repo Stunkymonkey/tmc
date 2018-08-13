@@ -1,0 +1,38 @@
+librds - client library to access Radio Data System Daemon rdsd
+===============================================================
+
+Author:   Hans J. Koch <hjkoch@users.berlios.de>
+Homepage: http://rdsd.berlios.de
+
+Features:
+
+* Connects to rdsd with TCP/IP or Unix domain sockets.
+* Handles all protocol and networking stuff.
+* Provides a simple C-compatible API.
+* Supports polling and event driven designs.
+
+License:
+
+librds is licensed under the LGPL. This means, that you can
+write closed source applications that link with librds.
+Note that you are still required to make the source code of 
+librds available, especially if you changed it. See COPYING
+for the complete license.
+
+Documentation:
+
+If you want to write an application that uses librds, you
+have to #include librds.h, please have a look at this file
+for more details. Exported API functions and (internal) public
+class methods have comments for doxygen. Use
+
+doxygen Doxyfile 
+
+in the top level source directory to create HTML documentation.
+
+For further questions, please subscribe to the rdsd-devel
+mailing list and post your question there. Try to avoid sending
+me private mail.
+
+Hans J. Koch
+  

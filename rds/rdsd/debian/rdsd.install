@@ -1,0 +1,2 @@
+debian/rdsd.conf	/etc
+README			/usr/share/doc/rdsd
