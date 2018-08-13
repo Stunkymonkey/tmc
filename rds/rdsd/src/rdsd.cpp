@@ -27,8 +27,13 @@
 #include <cstdlib>
 #include <csignal>
 #include <fcntl.h>
-#include <cstring>
+#include <string.h>
 #include <sstream>
+#include <cstdlib>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 using namespace std;
 

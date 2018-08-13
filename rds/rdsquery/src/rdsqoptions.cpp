@@ -27,6 +27,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <sstream>
+#include <cstdio>
 
 
 namespace std {

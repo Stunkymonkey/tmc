@@ -19,7 +19,9 @@
  ***************************************************************************/
 #include "rdsclient.h"
 #include <sstream>
-#include <cstdlib>
+#include <stdlib.h>
+#include <unistd.h>
+
 namespace std {
 
 RDSclient::RDSclient()

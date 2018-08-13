@@ -23,11 +23,13 @@
 #include <config.h>
 #endif
 
+#include <unistd.h>
 #include <iostream>
 #include <cstdlib>
 #include <vector>
 #include <csignal>
 #include <sstream>
+#include <stdio.h>
 #include "rdsqoptions.h"
 #include "rdsqueryhandler.h"
 
@@ -43,10 +45,10 @@ string my_unix_sock = "";
 void show_debug(RDSConnectionHandle hnd)
 {
   size_t buf_size = 0;
-  rds_get_debug_text(hnd,0,&buf_size); // query required size
+  rds_get_debug_text(hnd,0,buf_size); // query required size
   if (buf_size>0){
     vector<char> buf(buf_size);
-    rds_get_debug_text(hnd,&buf[0],&buf_size);
+    rds_get_debug_text(hnd,&buf[0],buf_size);
     string s(buf.begin(),buf.begin()+buf_size);
     cerr << s << endl;
   }

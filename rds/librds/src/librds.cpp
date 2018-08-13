@@ -128,10 +128,10 @@ int rds_set_debug_params(RDSConnectionHandle hnd, int debug_level, unsigned int 
 		  buf_size will receive the required size for buf.
   \return RDS_OK on success.
 */
-int rds_get_debug_text(RDSConnectionHandle hnd, char* buf, size_t* buf_size)
+int rds_get_debug_text(RDSConnectionHandle hnd, char* buf, size_t& buf_size)
 {
   RDSconnection* conn = (RDSconnection*)hnd;
-  return conn->GetDebugTextBuffer(buf,*buf_size);
+  return conn->GetDebugTextBuffer(buf,buf_size);
 }
 
 /*!

@@ -196,7 +196,7 @@ int rds_set_timeout_time(RDSConnectionHandle hnd, unsigned int timeout_msec);
 //! Set debug parameters.
 int rds_set_debug_params(RDSConnectionHandle hnd, int debug_level, unsigned int max_lines);
 //! Get stored debug messages or query the required buffer size.
-int rds_get_debug_text(RDSConnectionHandle hnd, char* buf, size_t* buf_size);
+int rds_get_debug_text(RDSConnectionHandle hnd, char* buf, size_t& buf_size);
 //! Enumerate the sources that rdsd knows about.
 int rds_enum_sources(RDSConnectionHandle hnd, char* buf, size_t bufsize);
 //! Set the event mask for a RDS data source.

@@ -296,14 +296,14 @@ void RdsQueryHandler::ShowSignalStrength()
 void RdsQueryHandler::show_debug()
 {
   size_t buf_size = 0;
-  int ret = rds_get_debug_text(handle,0, &buf_size); // query required size
+  int ret = rds_get_debug_text(handle,0, buf_size); // query required size
   if (ret){
     ShowError(ret);
     return;
   }
   if (buf_size>0){
     vector<char> buf(buf_size);
-    rds_get_debug_text(handle,&buf[0], &buf_size);
+    rds_get_debug_text(handle,&buf[0], buf_size);
     string s(buf.begin(),buf.begin()+buf_size);
     cerr << s << endl;
   }

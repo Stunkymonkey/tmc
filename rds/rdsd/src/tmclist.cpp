@@ -66,6 +66,7 @@ void TMClist::AddGroup(RDSgroup& group)
                          oss << "GS CI=" << CI << " GSI=" << GSI;
                          oss << " F1=" << event << " F2=" << location; // Free Format
                        }
+                     }
                      break;
     case TMC_SINGLE: oss << "S evt=" << event << " loc=" << location;
                      oss << " ext=" << extent << " dur=" << duration;
@@ -122,6 +123,7 @@ void TMClist::AddGroup(RDSgroup& group)
   if (add_string(oss.str())) is_changed = true;
   if (check_timeouts()) is_changed = true;
 }
+
 
 const string& TMClist::AsString()
 {
