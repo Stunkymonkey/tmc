@@ -13,19 +13,6 @@ export MANPATH="${PREFIX}/man${MANPATH:+:}${MANPATH:-}"
 export LD_LIBRARY_PATH="${PREFIX}/lib${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH:-}"
 export LDFLAGS="-L${PREFIX}/lib"
 
-for folder in \
-  "${BASE}/rds/librds/" \
-  "${BASE}/rds/rdsquery/" \
-  "${BASE}/rds/rdsd/" \
-  ; do
-	(cd "${folder}" \
-		&& autoreconf -fi \
-		&& ./configure --prefix="${PREFIX}"
-	)
-	make -C "${folder}" -j
-	make -C "${folder}" install
-done
-
 for dev in /dev/radio*; do
 	export RDSDEV="${dev}"
 	break
