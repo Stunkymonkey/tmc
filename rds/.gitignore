@@ -28,3 +28,11 @@ mkinstalldirs
 
 # General files
 *~
+
+# generated build artifacts
+rdsd/src/rdsd
+rdsquery/src/rdsquery
+librds/src/.libs
+
+# spooky build artefact
+rdsquery/stamp-h1
