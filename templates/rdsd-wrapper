@@ -1,0 +1,7 @@
+#!/bin/bash
+
+export PATH="${PREFIX}/bin${DOLLAR}{PATH:+:}${DOLLAR}{PATH:-}"
+export MANPATH="${PREFIX}/man${DOLLAR}{MANPATH:+:}${DOLLAR}{MANPATH:-}"
+export LD_LIBRARY_PATH="${PREFIX}/lib${DOLLAR}{LD_LIBRARY_PATH:+:}${DOLLAR}{LD_LIBRARY_PATH:-}"
+
+rdsd -c "${PREFIX}/rdsd.conf"
