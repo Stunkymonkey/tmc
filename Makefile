@@ -1,5 +1,12 @@
+RDSDEV := $(firstword $(wildcard /dev/radio*))
+
+export ANNOUNCE_BODY
+
 .PHONY: all
-all: rds
+all: rds #tmc
+	@echo RDSDEV IS $(RDSDEV)
+	@echo "$$ANNOUNCE_BODY"
+	export PATH=bin:$$PATH; echo $$PATH;
 
 .PHONY: rds librds rdsquery rdsd
 rds: librds rdsquery rdsd
@@ -16,8 +23,13 @@ rdsd: rds/rdsd/src/rdsd
 rds/rdsd/src/rdsd:
 	$(MAKE) -C rds/rdsd
 
-.PHONY: clean clean-rds clean-librds clean-rdsquery clean-rdsd
-clean: clean-rds
+.PHONY: tmc
+tmc: tmc/src/tmc
+tmc/src/tmc: librds
+	$(MAKE) -C tmc
+
+.PHONY: clean clean-rds clean-librds clean-rdsquery clean-rdsd #clean-tmc
+clean: clean-rds clean-tmc
 clean-rds: clean-librds clean-rdsquery clean-rdsd
 clean-librds:
 	$(MAKE) -C rds/librds clean
@@ -25,9 +37,11 @@ clean-rdsquery:
 	$(MAKE) -C rds/rdsquery clean
 clean-rdsd:
 	$(MAKE) -C rds/rdsd clean
+clean-tmc:
+	$(MAKE) -C tmc clean
 
-.PHONY: install install-rds install-librds install-rdsquery install-rdsd
-install: install-rds
+.PHONY: install install-rds install-librds install-rdsquery install-rdsd #install-tmc install-server
+install: install-rds #install-tmc install-server
 install-rds: install-librds install-rdsquery install-rdsd
 install-librds:
 	$(MAKE) -C rds/librds install
@@ -35,3 +49,30 @@ install-rdsquery:
 	$(MAKE) -C rds/rdsquery install
 install-rdsd:
 	$(MAKE) -C rds/rdsd install
+install-tmc:
+	$(MAKE) -C tmc install
+
+install-server:
+	DOLLAR=\$ envsubst < "${BASE}/templates/rdsd.conf"    > "${PREFIX}/rdsd.conf"
+	DOLLAR=\$ envsubst < "${BASE}/templates/rdsd.service" > "${PREFIX}/rdsd.service"
+	DOLLAR=\$ envsubst < "${BASE}/templates/rdsd-wrapper" > "${PREFIX}/bin/rdsd-wrapper"
+	chmod +x "${PREFIX}/bin/rdsd-wrapper"
+
+define ANNOUNCE_BODY
+
+Installation successful, please put this in your shellrc file and reload:
+
+export PATH="${PREFIX}/bin$${PATH:+:}$${PATH:-}"
+export MANPATH="${PREFIX}/man$${MANPATH:+:}$${MANPATH:-}"
+export LD_LIBRARY_PATH="${PREFIX}/lib$${LD_LIBRARY_PATH:+:}$${LD_LIBRARY_PATH:-}"
+export LDFLAGS="-L${PREFIX}/lib"
+
+Afterwards, you can run rdsd with the following command:
+
+rdsd-wrapper
+
+A systemd service file is located in "${PREFIX}/rdsd.service". Run this to enable rdsd:
+	ln -sT "${PREFIX}/rdsd.service" /etc/systemd/system/rdsd.service
+	systemctl enable --now rdsd
+
+endef
