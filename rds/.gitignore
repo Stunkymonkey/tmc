@@ -33,6 +33,8 @@ mkinstalldirs
 rdsd/src/rdsd
 rdsquery/src/rdsquery
 librds/src/.libs
+*/html/
+librds/librds.tag
 
 # spooky build artefact
 rdsquery/stamp-h1
