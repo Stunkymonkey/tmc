@@ -3,12 +3,12 @@ RDSDEV := $(firstword $(wildcard /dev/radio*))
 export ANNOUNCE_BODY
 
 .PHONY: all
-all: rds #tmc
+all: rds rdslog #tmc
 	@echo RDSDEV IS $(RDSDEV)
 	@echo "$$ANNOUNCE_BODY"
 	export PATH=bin:$$PATH; echo $$PATH;
 
-.PHONY: rds librds rdsquery rdsd
+.PHONY: rds librds rdsquery rdsd 
 rds: librds rdsquery rdsd
 
 librds: rds/librds/src/.libs/librds.so
@@ -23,13 +23,18 @@ rdsd: rds/rdsd/src/rdsd
 rds/rdsd/src/rdsd:
 	$(MAKE) -C rds/rdsd
 
+.PHONY: rdslog
+rdslog: rdslog/src/rdslog
+rdslog/src/rdslog: librds
+	$(MAKE) -C rdslog
+
 .PHONY: tmc
 tmc: tmc/src/tmc
 tmc/src/tmc: librds
 	$(MAKE) -C tmc
 
 .PHONY: clean clean-rds clean-librds clean-rdsquery clean-rdsd #clean-tmc
-clean: clean-rds clean-tmc
+clean: clean-rds rdslog #clean-tmc
 clean-rds: clean-librds clean-rdsquery clean-rdsd
 clean-librds:
 	$(MAKE) -C rds/librds clean
@@ -37,11 +42,15 @@ clean-rdsquery:
 	$(MAKE) -C rds/rdsquery clean
 clean-rdsd:
 	$(MAKE) -C rds/rdsd clean
+
+clean-rdslog:
+	$(MAKE) -C rdslog clean
+
 clean-tmc:
 	$(MAKE) -C tmc clean
 
 .PHONY: install install-rds install-librds install-rdsquery install-rdsd #install-tmc install-server
-install: install-rds #install-tmc install-server
+install: install-rds install-server install-rdslog#install-tmc
 install-rds: install-librds install-rdsquery install-rdsd
 install-librds:
 	$(MAKE) -C rds/librds install
@@ -51,6 +60,9 @@ install-rdsd:
 	$(MAKE) -C rds/rdsd install
 install-tmc:
 	$(MAKE) -C tmc install
+
+install-rdslog:
+	$(MAKE) -C rdslog install
 
 install-server:
 	DOLLAR=\$ envsubst < "${BASE}/templates/rdsd.conf"    > "${PREFIX}/rdsd.conf"

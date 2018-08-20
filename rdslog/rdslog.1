@@ -1,0 +1,58 @@
+.TH "rdslog" "1" "0.1.0" "Hans J. Koch" "Radio Data System data logging program"
+.SH "NAME"
+.LP 
+rdslog \- commandline tool to query data from a Radio Data System
+daemon (rdsd).
+
+This is a preliminary man page for the pre\-Alpha
+development version of rdslog. Not everything described
+in here necessarily works yet! Parameters might change
+before rdslog becomes stable.
+.SH "SYNTAX"
+.LP 
+rdslog [\fIoptions\fP]
+
+.SH "DESCRIPTION"
+.LP 
+rdslog is a client application to read decoded
+Radio Data System (RDS) data from a RDS daemon (rdsd).
+It connects to rdsd via TCP/IP or a unix domain socket.
+.LP 
+rdslog uses librds for the lowlevel communication routines
+and therefore depends on the librds package.
+
+.SH "OPTIONS"
+.LP 
+.TP 
+\fB\-s\fR <\fIserver\fP>
+Connect to rdsd running on <\fIserver\fP> using TCP/IP.
+<\fIserver\fP> can either be an IP address like 192.168.1.1 
+or a hostname your system is able to resolve.
+.TP 
+\fB\-p\fR <\fIport\fP>
+If your rdsd is not running on its default port 4321, you have to 
+specify the port with this option.
+.TP 
+\fB\-u\fR <\fIsocketname\fP>
+Connect to rdsd running on the same computer using an unix domain socket.
+.TP 
+\fB\-n\fR <\fInum\fP>
+The number of the source from which data should be retrieved. Numbering
+starts from 0.
+
+.TP 
+\fB\-h\fR
+Output some help text.
+.TP 
+\fB\-v\fR
+Output version information and exit.
+.SH "FILES"
+.LP 
+None, rdslog is solely configured through commandline options.
+
+.SH "AUTHORS"
+.LP 
+Hans J. Koch <hjkoch@users.berlios.de>
+.LP 
+Project homepage: http://rdsd.berlios.de
+
