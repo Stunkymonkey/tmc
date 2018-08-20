@@ -7,6 +7,7 @@ for folder in \
   "${BASE}/rds/librds/" \
   "${BASE}/rds/rdsquery/" \
   "${BASE}/rds/rdsd/" \
+  "${BASE}/rdslog/" \
   ; do
 	(cd "${folder}" \
 		&& autoreconf -fi \
