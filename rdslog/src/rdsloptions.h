@@ -39,6 +39,8 @@ public:
 	int GetPort() { return tcpip_port; }
 	int GetSourceNum() { return source_num; }
 	rds_events_t GetEventMask() { return event_mask; }
+	bool IsAppendMode() {return !have_opt_c; }
+	const string& GetFileName() { return file_name; }
 private:
 	int conn_type;
 	string server_name;
@@ -48,6 +50,8 @@ private:
 	bool have_opt_s;
 	bool have_opt_p;
 	bool have_opt_u;
+	bool have_opt_c;
+	string file_name;
 	void show_usage();
 	void show_version();
 	bool try_str_to_int(char *s, int &result);

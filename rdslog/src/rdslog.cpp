@@ -123,18 +123,18 @@ int main(int argc, char *argv[])
     clean_exit(hnd);
   }
 
-  RdsWriter *writer = new RdsWriter("example.txt", true);
+  RdsWriter *writer = new RdsWriter(opts.GetFileName(), opts.IsAppendMode());
 
   while (RDS_OK == rds_get_event(hnd,opts.GetSourceNum(),&events)){
     if (events & RDS_EVENT_TMC) {
       string ret = rds.ShowTMCList();
-      //cout << ret << endl;
       if (!writer->write(ret)) {
         cerr << "Unable to write to file." << endl;
       }
-      //delete ret;
+      //delete &ret;
     }
   }
+  delete writer;
 
   clean_exit(hnd);
   

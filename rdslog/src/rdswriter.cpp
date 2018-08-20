@@ -52,7 +52,7 @@ bool RdsWriter::write(string s) {
   std::string str_time(buffer);
 
   if (!myfile.is_open()) return false;
-  myfile << str_time << endl;
+  myfile << "tmc: " << str_time << endl;
   myfile << s << endl;
   return true;
 }
