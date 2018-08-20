@@ -34,9 +34,6 @@
 #include "rdsqueryhandler.h"
 #include "rdswriter.h"
 
-
-//#include <dlfcn.h>
-
 using namespace std;
 
 RDSConnectionHandle hnd = 0;
