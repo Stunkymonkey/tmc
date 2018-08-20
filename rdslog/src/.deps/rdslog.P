@@ -1,4 +1,4 @@
-rdsquery.o: rdsquery.cpp /usr/include/stdc-predef.h ../config.h \
+rdslog.o: rdslog.cpp /usr/include/stdc-predef.h ../config.h \
  /usr/include/c++/7/iostream \
  /usr/include/x86_64-linux-gnu/c++/7/bits/c++config.h \
  /usr/include/x86_64-linux-gnu/c++/7/bits/os_defines.h \
@@ -164,7 +164,7 @@ rdsquery.o: rdsquery.cpp /usr/include/stdc-predef.h ../config.h \
  /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
  /usr/include/x86_64-linux-gnu/bits/unistd.h rdsqoptions.h ../librds.h \
  rdsqueryhandler.h
-rdsquery.cpp :
+rdslog.cpp :
 /usr/include/stdc-predef.h :
 ../config.h :
 /usr/include/c++/7/iostream :

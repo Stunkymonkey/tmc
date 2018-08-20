@@ -33,8 +33,8 @@ tmc: tmc/src/tmc
 tmc/src/tmc: librds
 	$(MAKE) -C tmc
 
-.PHONY: clean clean-rds clean-librds clean-rdsquery clean-rdsd #clean-tmc
-clean: clean-rds rdslog #clean-tmc
+.PHONY: clean clean-rds clean-librds clean-rdsquery clean-rdsd
+clean: clean-rds clean-rdslog #clean-tmc
 clean-rds: clean-librds clean-rdsquery clean-rdsd
 clean-librds:
 	$(MAKE) -C rds/librds clean
@@ -43,14 +43,16 @@ clean-rdsquery:
 clean-rdsd:
 	$(MAKE) -C rds/rdsd clean
 
+.PHONY: clean-rdslog
 clean-rdslog:
 	$(MAKE) -C rdslog clean
 
+.PHONY: clean-tmc
 clean-tmc:
 	$(MAKE) -C tmc clean
 
-.PHONY: install install-rds install-librds install-rdsquery install-rdsd #install-tmc install-server
-install: install-rds install-server install-rdslog#install-tmc
+.PHONY: install install-rds install-librds install-rdsquery install-rdsd
+install: install-rds install-server install-rdslog #install-tmc
 install-rds: install-librds install-rdsquery install-rdsd
 install-librds:
 	$(MAKE) -C rds/librds install
@@ -58,12 +60,16 @@ install-rdsquery:
 	$(MAKE) -C rds/rdsquery install
 install-rdsd:
 	$(MAKE) -C rds/rdsd install
-install-tmc:
-	$(MAKE) -C tmc install
 
+.PHONY: install-rdslog
 install-rdslog:
 	$(MAKE) -C rdslog install
 
+.PHONY: install-tmc
+install-tmc:
+	$(MAKE) -C tmc install
+
+.PHONY: install-server
 install-server:
 	DOLLAR=\$ envsubst < "${BASE}/templates/rdsd.conf"    > "${PREFIX}/rdsd.conf"
 	DOLLAR=\$ envsubst < "${BASE}/templates/rdsd.service" > "${PREFIX}/rdsd.service"
