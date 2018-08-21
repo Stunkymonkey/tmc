@@ -49,11 +49,12 @@ RdsqOptions::~RdsqOptions()
 
 bool RdsqOptions::ProcessCmdLine(int argc, char *argv[])
 {
-  char option;
+  int intopt;
   int itmp;
   rds_events_t evnt_tmp;
 
   while ( (option = getopt(argc,argv,"hvn:s:u:p:c:f:")) != EOF ) {
+  	char option = intopt & 0xFF;
     switch (option){
       case 'n' :  if (try_str_to_int(optarg,itmp)) source_num=itmp;
                   else {
