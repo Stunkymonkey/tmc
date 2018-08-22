@@ -1,19 +1,18 @@
 var bounds = [
-    [47.3, 5.9], // Southwest coordinates
-    [54.9, 16.9512215]  // Northeast coordinates
+    [47.2, 5.8], // Southwest coordinates
+    [55.0, 15.4]  // Northeast coordinates
 ];
-var map = new L.map('map').setView([50.5, 9.125], 6);//.setMaxBounds(bounds);
+var map = new L.map('map').setView([48.7758, 9.1829], 13).setMaxBounds(bounds);
 
 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
     center: map.getBounds().getCenter(),
-    maxZoom: 18,
-    minZoom: 2,
+    maxZoom: 16,
+    minZoom: 6,
     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
     '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
     'Imagery © <a href="http://mapbox.com">Mapbox</a>',
     id: 'mapbox.streets',
-    zoom: 7,
-    maxBoundsViscosity: 1.0
+    zoom: 11,
 }).addTo(map);
 
 map.doubleClickZoom.disable();
@@ -57,7 +56,7 @@ function onMapClick(e){
     lon = e.latlng.lng;
     var popup = L.popup()
         .setLatLng(e.latlng)
-        .setContent("here click")
+        .setContent(lat + ", " + lon)
         .openOn(map);
 }
 //request
@@ -78,17 +77,10 @@ function search() {
     console.log("request: " + data);
     xhr.send(data);
 }
-//Called on ButtonClick [Draw Route]. Calls function sendData and deletes the existing Route.
-function drawRoute() {
-    sendData();
-    if (isRouteDrawn) {
-        map.removeLayer(layerlist["line"]);
-    }
-}
 //Called from sendData. Creates Geojsonobject for the received Route.
 function createGeoJson(json) {
-	console.log("answer: " + json.route);
-	if (isGoalDrawn && isStartDrawn) {
+    console.log("answer: " + json.route);
+    if (isGoalDrawn && isStartDrawn) {
         isRouteDrawn = true;
         var myLines = [{
             "type": "LineString",
@@ -110,23 +102,10 @@ function createGeoJson(json) {
             }
         }).addTo(map);
     }
-	console.log("done painting");
+    console.log("done painting");
 }
-//Infopannel in the topright corner.
-var info = L.control();
-info.onAdd = function (map) {
-    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
-    L.DomEvent.disableClickPropagation(this._div);
-    this.update();
-    return this._div;
-};
-info.update = function (props) {
-    this._div.innerHTML = '<h4>Search</h4>'
-        + '<div class="start">Start: </div>'
-        + '<input type="datetime-local" id="end-time" name="party-time" value="2018-06-12T19:30" min="2018-06-07T00:00" max="2018-06-14T00:00"  required />'
-        + '<br> <div class="end"> End: </div>'
-        + '<input type="datetime-local" id="end-time" name="party-time" value="2018-06-12T19:30" min="2018-06-07T00:00" max="2018-06-14T00:00"  required />'
-        + '<br>'
-        + '<button class="btn3"onclick="search()">search</button>';
-};
-info.addTo(map);
+
+var heat = L.heatLayer([
+    [48.7758, 9.1829, 0.2],
+    [48.78161734209156, 9.186716079711916, 0.2]
+], {radius: 25}).addTo(map);
