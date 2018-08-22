@@ -48,7 +48,7 @@ bool RdsWriter::write(string s) {
   time (&rawtime);
   timeinfo = localtime(&rawtime);
 
-  strftime(buffer,sizeof(buffer),"%Y-%m-%dT%H:%M:%S",timeinfo);
+  strftime(buffer,sizeof(buffer),"%FT%T",timeinfo);
   std::string str_time(buffer);
 
   if (!myfile.is_open()) return false;
