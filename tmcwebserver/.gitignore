@@ -1,3 +1,5 @@
 POINTS.DAT
 html/leaflet-heat.js
+html/points.json
+html/poffsets.json
 webserver
