@@ -46,23 +46,13 @@ mime_type(boost::beast::string_view path)
     }();
     if(iequals(ext, ".htm"))  return "text/html";
     if(iequals(ext, ".html")) return "text/html";
-    if(iequals(ext, ".php"))  return "text/html";
     if(iequals(ext, ".css"))  return "text/css";
     if(iequals(ext, ".txt"))  return "text/plain";
     if(iequals(ext, ".js"))   return "application/javascript";
     if(iequals(ext, ".json")) return "application/json";
-    if(iequals(ext, ".xml"))  return "application/xml";
-    if(iequals(ext, ".swf"))  return "application/x-shockwave-flash";
-    if(iequals(ext, ".flv"))  return "video/x-flv";
     if(iequals(ext, ".png"))  return "image/png";
-    if(iequals(ext, ".jpe"))  return "image/jpeg";
     if(iequals(ext, ".jpeg")) return "image/jpeg";
     if(iequals(ext, ".jpg"))  return "image/jpeg";
-    if(iequals(ext, ".gif"))  return "image/gif";
-    if(iequals(ext, ".bmp"))  return "image/bmp";
-    if(iequals(ext, ".ico"))  return "image/vnd.microsoft.icon";
-    if(iequals(ext, ".tiff")) return "image/tiff";
-    if(iequals(ext, ".tif"))  return "image/tiff";
     if(iequals(ext, ".svg"))  return "image/svg+xml";
     if(iequals(ext, ".svgz")) return "image/svg+xml";
     return "application/text";
@@ -149,6 +139,7 @@ handle_request(
 
     // Make sure we can handle the method
     if( req.method() != http::verb::get &&
+        req.method() != http::verb::post &&
         req.method() != http::verb::head)
         return send(bad_request("Unknown HTTP-method"));
 
@@ -162,6 +153,48 @@ handle_request(
     std::string path = path_cat(doc_root, req.target());
     if(req.target().back() == '/')
         path.append("index.html");
+
+    if(req.method() == http::verb::get && req.target() == "/date-range")
+    {
+        http::response<http::dynamic_body> res{http::status::ok, req.version()};
+        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        res.set(http::field::content_type, "application/json");
+        res.keep_alive(req.keep_alive());
+        boost::beast::ostream(res.body())
+                << "{\n"
+                << "\t\"min\": \""
+                //<<  min()
+                << "\",\n"
+                << "\t\"max\": \""
+                //<<  max()
+                <<  "\"\n}\n";
+        return send(std::move(res));
+    }
+    else if(req.method() == http::verb::post && req.target() == "/query")
+    {
+        http::response<http::dynamic_body> res{http::status::ok, req.version()};
+        res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+        res.set(http::field::content_type, "application/json");
+        res.keep_alive(req.keep_alive());
+        boost::beast::ostream(res.body())
+                << "{\n"
+                // execute query
+                // iterate and generate json
+                << "\t\"event\": {"
+                //<<  lala
+                << "\n\t\t\"lat\": "
+                << 12
+                << ",\n\t\t\"long\": "
+                << 13
+                << "\n\t},\n"
+                //<<  lala
+                << "}\n";
+        return send(std::move(res));
+    }
+    else if(req.method() == http::verb::post)
+    {
+    	return send(not_found(req.target()));
+    }
 
     // Attempt to open the file
     boost::beast::error_code ec;
@@ -458,9 +491,9 @@ int main(int argc, char* argv[])
     if (argc != 5)
     {
         std::cerr <<
-            "Usage: http-server-async <address> <port> <doc_root> <threads>\n" <<
+            "Usage: webserver <address> <port> <doc_root> <threads>\n" <<
             "Example:\n" <<
-            "    http-server-async 0.0.0.0 8080 . 1\n";
+            "    webserver 0.0.0.0 8080 ./html/ 1\n";
         return EXIT_FAILURE;
     }
     auto const address = boost::asio::ip::make_address(argv[1]);
