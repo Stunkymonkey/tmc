@@ -8,6 +8,7 @@ for folder in \
   "${BASE}/rds/rdsquery/" \
   "${BASE}/rds/rdsd/" \
   "${BASE}/rdslog/" \
+  "${BASE}/tmcimport/" \
   ; do
 	(cd "${folder}" \
 		&& autoreconf -fi \

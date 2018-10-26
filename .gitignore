@@ -26,11 +26,19 @@ mkinstalldirs
 *.Po
 *.Plo
 
+
 # General files
 *~
 
 rdslog/src/rdslog
+tmcimport/src/tmcimport
 
 # spooky build artefact
 rdslog/stamp-h1
 rdslog/example.txt
+
+# spooky build artefact
+tmcimport/stamp-h1
+
+# unknown
+*.Tpo
