@@ -130,19 +130,6 @@ function overlay_points() {
     xhr_p.send();
 }
 
-function overlay_points() {
-    var xhr_p = new XMLHttpRequest();
-    xhr_p.open("GET", url + "points.json", true);
-    xhr_p.setRequestHeader("Content-type", "application/json");
-    xhr_p.onreadystatechange = function () {
-        if (xhr_p.readyState === 4 && xhr_p.status === 200) {
-            var json = JSON.parse(xhr_p.responseText);
-            DrawOverlayPoints(json);
-        }
-    };
-    xhr_p.send();
-}
-
 function DrawOverlayLines(json) {
     if (!isOverlayLinesDrawn) {
         isOverlayLinesDrawn = true;
