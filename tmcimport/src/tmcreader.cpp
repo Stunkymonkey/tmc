@@ -24,19 +24,10 @@ using namespace std;
 
 TmcReader::TmcReader(string filename)
 {
-  cout << filename << endl;
-  // Open the file
   boost::iostreams::file_source myCprdFile (filename, std::ios_base::in | std::ios_base::binary);
 
-  // Uncompress the file with the BZ2 library and its Boost wrapper
-  boost::iostreams::filtering_istream bunzip2Filter;
   bunzip2Filter.push (boost::iostreams::bzip2_decompressor());
   bunzip2Filter.push (myCprdFile);
-
-  cout << bunzip2Filter.good() << endl;
-  string itReadLine;
-  getline(bunzip2Filter, itReadLine);
-  cout << itReadLine << std::endl;
 }
 
 TmcReader::~TmcReader()
@@ -45,11 +36,8 @@ TmcReader::~TmcReader()
 }
 
 bool TmcReader::read(string &s) {
-  cout << bunzip2Filter.good() << endl;
   if(getline(bunzip2Filter, s)) {
-    cout << s << endl;
     return true;
   }
-  cout << s << endl;
   return false;
 }

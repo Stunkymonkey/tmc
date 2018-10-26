@@ -31,5 +31,4 @@ public:
 	bool read(string &s);
 private:
 	boost::iostreams::filtering_istream bunzip2Filter;
-	//boost::iostreams::file_source myCprdFile;
 };

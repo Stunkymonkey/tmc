@@ -84,11 +84,9 @@ int main(int argc, char *argv[])
   TmcReader *reader = new TmcReader(opts.GetFileName());
 
   string line;
-  cout << "test" << endl;
   while(reader->read(line)) {
     cout << line << endl;
   }
-  cout << "end" << endl;
 
   delete reader;
   // remove for live
