@@ -22,8 +22,20 @@
         <br><br>
         <button class="overlay" onclick="overlay()">Draw Overlay</button>
     </div>
+    <div id="animate">
+        <div class="playpause">
+          <input type="checkbox" value="" id="playPauseCheckbox" name="playPauseCheckbox" checked />
+          <label for="playPauseCheckbox"></label>
+        </div>
+        <div class="slidecontainer">
+          <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+        </div>
+        <div class="speed">
+        <input type="number" id="speed" name="speed" placeholder="Speed" step="0.1" min="0.1" max="100" />
+        </div>
+    </div>
     <div id="map"></div>
-    <script src="leaflet-heat.js"></script>
+    <!-- <script src="leaflet-heat.js"></script> -->
     <script src="leaflet_script.js"></script>
 </body>
 </html>

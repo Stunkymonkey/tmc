@@ -148,8 +148,9 @@ function DrawOverlayPoints(json) {
     if (!isOverlayPointsDrawn) {
         isOverlayPointsDrawn = true;
         for (var i = 0; i < json.length; i++) {
-            L.circleMarker(json[i]["coordinates"], {
-                radius: 1,
+            L.circle(json[i]["coordinates"], {
+                radius: 100,
+                weight: 0,
                 color: 'red'
             }).addTo(map).bindPopup('lcd ' + json[i]["lcd"]);
         }
@@ -164,7 +165,7 @@ function onEachFeature(feature, layer) {
     }
 }
 
-var heat = L.heatLayer([
-    [48.7758, 9.1829, 0.2],
-    [48.78161734209156, 9.186716079711916, 0.2]
-], {radius: 25}).addTo(map);
+// var heat = L.heatLayer([
+//     [48.7758, 9.1829, 0.2],
+//     [48.78161734209156, 9.186716079711916, 0.2]
+// ], {radius: 25}).addTo(map);

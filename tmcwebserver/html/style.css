@@ -2,12 +2,14 @@ body {
     margin: 0;
     padding: 0;
 }
+
 #map {
     position: absolute;
     top: 0;
     height: 100%;
     width: 100%;
 }
+
 #info {
     position: absolute;
     top: 8px;
@@ -18,7 +20,80 @@ body {
     width: 200px;
     z-index: 1000;
 }
+
 #info h4 {
     margin: 0 0 0;
     color: #777;
+}
+
+#animate {
+    position: fixed;
+    width: 100%;
+    bottom: 0%;
+    /*bisschen padding*/
+    padding: 1em;
+    /*wichtig für die gesamtgröße inklusive padding*/
+    box-sizing: border-box;
+    background: rgba(255,255,255,0.8);
+    z-index: 1000;
+    /*magie*/
+    display: flex;
+    /*vertikal zentrieren*/
+    align-items: center;
+}
+
+.slidecontainer {
+    flex-grow: 2;
+}
+
+.playpause label {
+  float:left;
+  display: block;
+  box-sizing: border-box;
+  width: 0;
+  height: 74px;
+  border-color: transparent transparent transparent #202020;
+  transition: 100ms all ease;
+  cursor: pointer;
+  border-style: double;
+  border-width: 0px 0 0px 60px;
+}
+.playpause input[type="checkbox"] {
+  position: absolute;
+  left: -9999px;
+}
+.playpause input[type="checkbox"]:checked + label {
+  border-style: solid;
+  border-width: 37px 0 37px 60px;
+}
+.playpause input[type="checkbox"]:focus + label {
+  box-shadow: 0 0 5px lightblue;
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 90%;
+    height: 50px;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #2b5696;
+    cursor: pointer;
+}
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #2b5696;
+    cursor: pointer;
 }
