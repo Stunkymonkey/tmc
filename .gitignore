@@ -32,8 +32,8 @@ mkinstalldirs
 
 # source files
 POINTS.DAT
-html/points.json
-html/poffsets.json
+points.json
+poffsets.json
 
 rdslog/src/rdslog
 tmcimport/src/tmcimport

@@ -15,11 +15,18 @@
 <body>
     <div id="info">
         <h4>Search</h4>
-        <br>Start: <input type="date" id="start-time" value="2018-08-22" min="2018-08-22" max="2019-08-22" required/>
-        <br>End: <input type="date" id="end-time" value="2018-08-23" min="2018-08-22" max="2019-08-22" required/>
+        <label>
+            Start:
+        </label>
+        <input type="date" id="start-time" value="2018-08-22" min="2018-08-22" max="2019-08-22" required/>
+        <br>
+        <label>
+            End:
+        </label>
+        <input type="date" id="end-time" value="2018-08-23" min="2018-08-22" max="2019-08-22" required/>
         <br>
         <button class="search" onclick="search()">Search</button>
-        <br><br>
+        <br>
         <button class="overlay" onclick="overlay()">Draw Overlay</button>
     </div>
     <div id="animate">
@@ -31,7 +38,8 @@
           <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
         </div>
         <div class="speed">
-        <input type="number" id="speed" name="speed" placeholder="Speed" step="0.1" min="0.1" max="100" />
+            Speed:<br>
+        <input type="number" id="speed" name="speed" value="1.0" placeholder="Speed" step="0.5" min="0.5" max="10"/>
         </div>
     </div>
     <div id="map"></div>
