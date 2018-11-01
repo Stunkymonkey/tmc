@@ -1,4 +1,4 @@
-RDSDEV := $(firstword $(wildcard /dev/radio*))
+#RDSDEV := $(firstword $(wildcard /dev/radio*))
 
 #export ANNOUNCE_BODY
 #export PATH=bin:$$PATH; echo $$PATH;
@@ -38,6 +38,7 @@ tmcwebserver: tmcwebserver/src/tmcwebserver
 tmcwebserver/src/tmcwebserver:
 	$(MAKE) -C tmcwebserver
 
+
 .PHONY: clean clean-rds clean-rdslog clean-tmcimport clean-tmcwebserver
 clean: clean-rds clean-rdslog clean-tmcimport clean-tmcwebserver
 
@@ -61,7 +62,6 @@ clean-tmcimport:
 .PHONY: clean-tmcwebserver
 clean-tmcwebserver:
 	$(MAKE) -C tmcwebserver clean
-
 
 
 .PHONY: install install-rds install-librds install-rdsquery install-rdsd

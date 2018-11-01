@@ -1,22 +1,3 @@
-/***************************************************************************
- *   Copyright (C) 2005 by Hans J. Koch                                    *
- *   hjkoch@users.berlios.de                                               *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
 #include <iostream>
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
@@ -24,11 +5,13 @@
 
 using namespace std;
 
-class TmcReader{
+class TmcReader {
 public:
 	TmcReader(string filename);
 	~TmcReader();
-	bool read(string &s);
+	bool getChunk(string &s);
 private:
 	boost::iostreams::filtering_istream bunzip2Filter;
+	bool read(string &s);
+	char peekChar();
 };
