@@ -7,8 +7,5 @@ INCLUDES = $(all_includes)
 # the library search path.
 rdsquery_LDFLAGS = $(all_libraries)
 
-
-
-
-rdsquery_LDADD = -lrds
+rdsquery_LDADD = -lrds -L../../librds/src/.libs
 noinst_HEADERS = rdsqueryhandler.h rdsqoptions.h
