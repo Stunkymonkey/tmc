@@ -1,4 +1,4 @@
-AC_INIT(configure.in)
+AC_INIT(configure.ac)
 
 AM_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE(rdsquery, 0.0.1)

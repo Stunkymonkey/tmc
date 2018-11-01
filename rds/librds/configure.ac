@@ -1,4 +1,4 @@
-AC_INIT(configure.in)
+AC_INIT(configure.ac)
 
 AC_CONFIG_AUX_DIR([.])
 
