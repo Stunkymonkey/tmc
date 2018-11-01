@@ -30,15 +30,17 @@ mkinstalldirs
 # General files
 *~
 
+# source files
+POINTS.DAT
+html/points.json
+html/poffsets.json
+
 rdslog/src/rdslog
 tmcimport/src/tmcimport
+tmcwebserver/src/tmcwebserver
 
 # spooky build artefact
-rdslog/stamp-h1
-rdslog/example.txt
-
-# spooky build artefact
-tmcimport/stamp-h1
+stamp-h1
 
 # unknown
 *.Tpo
