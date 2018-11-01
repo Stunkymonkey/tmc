@@ -1,14 +1,14 @@
 RDSDEV := $(firstword $(wildcard /dev/radio*))
 
-export ANNOUNCE_BODY
+#export ANNOUNCE_BODY
+#export PATH=bin:$$PATH; echo $$PATH;
+#@echo RDSDEV IS $(RDSDEV)
+#@echo "$$ANNOUNCE_BODY"
 
 .PHONY: all
-all: rds rdslog #tmc
-	@echo RDSDEV IS $(RDSDEV)
-	@echo "$$ANNOUNCE_BODY"
-	export PATH=bin:$$PATH; echo $$PATH;
+all: rds rdslog tmcimport tmcwebserver
 
-.PHONY: rds librds rdsquery rdsd 
+.PHONY: rds librds rdsquery rdsd
 rds: librds rdsquery rdsd
 
 librds: rds/librds/src/.libs/librds.so
@@ -28,13 +28,20 @@ rdslog: rdslog/src/rdslog
 rdslog/src/rdslog: librds
 	$(MAKE) -C rdslog
 
-.PHONY: tmc
-tmc: tmc/src/tmc
-tmc/src/tmc: librds
-	$(MAKE) -C tmc
+.PHONY: tmcimport
+tmcimport: tmcimport/src/tmcimport
+tmcimport/src/tmcimport:
+	$(MAKE) -C tmcimport
 
-.PHONY: clean clean-rds clean-librds clean-rdsquery clean-rdsd
-clean: clean-rds clean-rdslog #clean-tmc
+.PHONY: tmcwebserver
+tmcwebserver: tmcwebserver/src/tmcwebserver
+tmcwebserver/src/tmcwebserver:
+	$(MAKE) -C tmcwebserver
+
+.PHONY: clean clean-rds clean-rdslog clean-tmcimport clean-tmcwebserver
+clean: clean-rds clean-rdslog clean-tmcimport clean-tmcwebserver
+
+.PHONY: clean-librds clean-rdsquery clean-rdsd
 clean-rds: clean-librds clean-rdsquery clean-rdsd
 clean-librds:
 	$(MAKE) -C rds/librds clean
@@ -47,12 +54,18 @@ clean-rdsd:
 clean-rdslog:
 	$(MAKE) -C rdslog clean
 
-.PHONY: clean-tmc
-clean-tmc:
-	$(MAKE) -C tmc clean
+.PHONY: clean-tmcimport
+clean-tmcimport:
+	$(MAKE) -C tmcimport clean
+
+.PHONY: clean-tmcwebserver
+clean-tmcwebserver:
+	$(MAKE) -C tmcwebserver clean
+
+
 
 .PHONY: install install-rds install-librds install-rdsquery install-rdsd
-install: install-rds install-server install-rdslog #install-tmc
+install: install-rds install-server install-rdslog install-tmcimport install-tmcwebserver
 install-rds: install-librds install-rdsquery install-rdsd
 install-librds:
 	$(MAKE) -C rds/librds install
@@ -65,9 +78,13 @@ install-rdsd:
 install-rdslog:
 	$(MAKE) -C rdslog install
 
-.PHONY: install-tmc
-install-tmc:
-	$(MAKE) -C tmc install
+.PHONY: install-tmcimport
+install-tmcimport:
+	$(MAKE) -C tmcimport install
+
+.PHONY: install-tmcwebserver
+install-tmcwebserver:
+	$(MAKE) -C tmcwebserver install
 
 .PHONY: install-server
 install-server:
