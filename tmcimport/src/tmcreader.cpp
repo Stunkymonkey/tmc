@@ -17,10 +17,7 @@ TmcReader::~TmcReader()
 
 bool TmcReader::read(string &s) {
 	// get next line and returen status of stream
-	if (getline(bunzip2Filter, s)) {
-		return true;
-	}
-	return false;
+	return (bool)getline(bunzip2Filter, s);
 }
 
 char TmcReader::peekChar() {
@@ -29,6 +26,11 @@ char TmcReader::peekChar() {
 }
 
 bool TmcReader::getChunk(string &result) {
+	// check if filreader is at the end
+	if (peekChar() == EOF) {
+		cout << "file is read" << endl;
+		return false;
+	}
 	// check if next line begins with "tmc:" (only checking t)
 	if (peekChar() != 't') {
 		cout << "weird chunk" << endl;
@@ -38,7 +40,7 @@ bool TmcReader::getChunk(string &result) {
 	result = "";
 	bool status = false;
 	read(result);
-	while(peekChar() != 't') {
+	while(peekChar() != 't' && peekChar() != EOF) {
 		result.append("\n");
 		string tmp;
 		status = read(tmp);

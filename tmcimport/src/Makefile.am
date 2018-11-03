@@ -1,5 +1,5 @@
 bin_PROGRAMS = tmcimport
-tmcimport_SOURCES = tmcimport.cpp tmcqueryhandler.cpp tmcioptions.cpp tmcreader.cpp tmcfilter.cpp tmcdata.cpp
+tmcimport_SOURCES = tmcimport.cpp tmcqueryhandler.cpp tmcioptions.cpp tmcreader.cpp tmcdata.cpp
 
 # set the include path found by configure
 AM_CPPFLAGS = $(all_includes)
@@ -8,4 +8,4 @@ AM_CPPFLAGS = $(all_includes)
 tmcimport_LDFLAGS = $(all_libraries)
 
 tmcimport_LDADD = -lrds -lboost_iostreams -L../../rds/librds/src/.libs/
-noinst_HEADERS = tmcqueryhandler.h tmcioptions.h tmcreader.h tmcfilter.h tmcdata.h
+noinst_HEADERS = tmcqueryhandler.h tmcioptions.h tmcreader.h tmcdata.h

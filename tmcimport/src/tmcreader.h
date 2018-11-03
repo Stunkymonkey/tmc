@@ -3,15 +3,13 @@
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
 
-using namespace std;
-
 class TmcReader {
 public:
-	TmcReader(string filename);
+	TmcReader(std::string filename);
 	~TmcReader();
-	bool getChunk(string &s);
+	bool getChunk(std::string &s);
 private:
 	boost::iostreams::filtering_istream bunzip2Filter;
-	bool read(string &s);
+	bool read(std::string &s);
 	char peekChar();
 };

@@ -12,6 +12,7 @@
 #include "tmcioptions.h"
 #include "tmcqueryhandler.h"
 #include "tmcreader.h"
+#include "tmcdata.h"
 
 using namespace std;
 
@@ -60,17 +61,16 @@ int main(int argc, char *argv[])
 	RdsqOptions opts;
 	if (! opts.ProcessCmdLine(argc, argv)) exit(1);
 
+	TmcData *manager = new TmcData();
+
 	TmcReader *reader = new TmcReader(opts.GetFileName());
 
 	string chunk = "";
-	int i = 0;
 	while (reader->getChunk(chunk)) {
-		cout << "##########" << i << endl;
-		i++;
-		//cout << chunk << endl;
+		manager->insert(chunk);
 	}
-	cout << "reached" << endl;
 	delete reader;
+
 	// remove for live
 	return 0;
 
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 	while (RDS_OK == rds_get_event(hnd,opts.GetSourceNum(),&events)){
 		if (events & RDS_EVENT_TMC) {
 			string ret = rds.ShowTMCList();
-			// do something with ret
+			manager->insert(ret);
 		}
 	}
 
