@@ -3,6 +3,5 @@
 AUTOMAKE_OPTIONS = foreign 1.4
 EXTRA_DIST=Doxyfile
 SUBDIRS = src
-
-
+ACLOCAL_AMFLAGS = -I m4
 

@@ -1,7 +1,7 @@
-AC_INIT(configure.ac)
-
+AC_INIT([rdslog], [0.0.1])
 AM_CONFIG_HEADER(config.h)
-AM_INIT_AUTOMAKE(rdslog, 0.0.1)
+AC_CONFIG_SRCDIR(configure.ac)
+AM_INIT_AUTOMAKE
 
 AC_LANG_CPLUSPLUS
 AC_PROG_CXX
