@@ -1,10 +1,11 @@
 #include <string>
+#include <vector>
 
 class TmcData {
 public:
 	TmcData();
 	~TmcData();
-	void insert(std::string new_string);
+	void addChunk(std::string new_string);
 private:
-	std::string old = "";
+	std::vector <std::string> old_strings;
 };

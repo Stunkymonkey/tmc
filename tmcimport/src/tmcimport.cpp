@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 
 	string chunk = "";
 	while (reader->getChunk(chunk)) {
-		manager->insert(chunk);
+		manager->addChunk(chunk);
 	}
 	delete reader;
 
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 	while (RDS_OK == rds_get_event(hnd,opts.GetSourceNum(),&events)){
 		if (events & RDS_EVENT_TMC) {
 			string ret = rds.ShowTMCList();
-			manager->insert(ret);
+			manager->addChunk(ret);
 		}
 	}
 
