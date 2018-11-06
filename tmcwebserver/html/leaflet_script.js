@@ -148,11 +148,11 @@ function DrawOverlayPoints(json) {
 	if (!isOverlayPointsDrawn) {
 		isOverlayPointsDrawn = true;
 		for (var i = 0; i < json.length; i++) {
-			L.circle(json[i]["coordinates"], {
+			L.circle(json[i][1], {
 				radius: 100,
 				weight: 0,
 				color: 'red'
-			}).addTo(map).bindPopup('lcd ' + json[i]["lcd"]);
+			}).addTo(map).bindPopup("" + json[i][0]);
 		}
 	}
 	console.log("done painting points");
