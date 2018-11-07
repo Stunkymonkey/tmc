@@ -136,7 +136,7 @@ function DrawOverlayLines(json) {
 		for (var i = 0; i < json.length; i++) {
 			L.polyline(json[i], {
 				weight: 2,
-				color: 'blue'
+				color: "#386cb0"
 			}).addTo(map);
 		}
 	}
@@ -149,9 +149,9 @@ function DrawOverlayPoints(json) {
 		isOverlayPointsDrawn = true;
 		for (var i = 0; i < json.length; i++) {
 			L.circle(json[i][1], {
-				radius: 100,
-				weight: 0,
-				color: 'red'
+				radius: 50,
+				weight: 0.2,
+				color: "#f0027f"
 			}).addTo(map).bindPopup("" + json[i][0]);
 		}
 	}
