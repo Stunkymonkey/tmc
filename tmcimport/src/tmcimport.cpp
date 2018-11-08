@@ -12,7 +12,7 @@
 #include "tmcioptions.h"
 #include "tmcqueryhandler.h"
 #include "tmcreader.h"
-#include "tmcdata.h"
+#include "tmcfilter.h"
 
 using namespace std;
 
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 	RdsqOptions opts;
 	if (! opts.ProcessCmdLine(argc, argv)) exit(1);
 
-	TmcData *manager = new TmcData();
+	TmcFilter *manager = new TmcFilter();
 
 	TmcReader *reader = new TmcReader(opts.GetFileName());
 

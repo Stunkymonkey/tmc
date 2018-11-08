@@ -1,19 +1,19 @@
-#include "tmcdata.h"
+#include "tmcfilter.h"
 #include <boost/tokenizer.hpp>
 #include <iostream>
 
 using namespace std;
 
-TmcData::TmcData()
+TmcFilter::TmcFilter()
 {
 }
 
-TmcData::~TmcData()
+TmcFilter::~TmcFilter()
 {
 	old_strings.clear();
 }
 
-void TmcData::addChunk(string new_string) {
+void TmcFilter::addChunk(string new_string) {
 	// this function checks what updates are in the new string
 	typedef boost::tokenizer<boost::char_separator<char> >tokenizer;
 	boost::char_separator<char> sep("\n");
@@ -55,7 +55,7 @@ void TmcData::addChunk(string new_string) {
 	}
 }
 
-void TmcData::printEvent(time_t time, std::string line, bool isNew) {
+void TmcFilter::printEvent(time_t time, std::string line, bool isNew) {
 	// debug helper
 	struct tm * timeinfo;
 	char buffer[80];
@@ -71,7 +71,7 @@ void TmcData::printEvent(time_t time, std::string line, bool isNew) {
 }
 
 
-void TmcData::processLine(time_t time, std::string line, bool isNew) {
+void TmcFilter::processLine(time_t time, std::string line, bool isNew) {
 	if (line.front() == 'Y') {
 		return;
 	}
@@ -81,6 +81,7 @@ void TmcData::processLine(time_t time, std::string line, bool isNew) {
 	tokenizer;
 	boost::char_separator<char> sep(" ");
 	tokenizer tokens(line, sep);
-	for (tokenizer::iterator tok_iter = tokens.begin(); tok_iter != tokens.end(); ++tok_iter)
-		std::cout << *tok_iter << endl;
+	for (tokenizer::iterator tok_iter = tokens.begin(); tok_iter != tokens.end(); ++tok_iter) {
+		//std::cout << *tok_iter << endl;
+	}
 }
