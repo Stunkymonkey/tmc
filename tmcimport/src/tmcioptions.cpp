@@ -96,7 +96,7 @@ void RdsqOptions::ShowOptions()
 void RdsqOptions::show_usage()
 {
 	cerr << "Usage:" << endl;
-	cerr << "query-logger [-s|-u <server>] <options>" << endl;
+	cerr << "tmcimport [-s|-u <server>] <options>" << endl;
 	cerr << "-h : Show this help and exit." << endl;
 	cerr << "-v : Show version information and exit." << endl;
 	cerr << "-s <TCP/IP-Server>: Address/name of the machine where rdsd is running." << endl;
@@ -104,6 +104,11 @@ void RdsqOptions::show_usage()
 	cerr << "-u <Unix socket>: Socket where rdsd is listening (default /var/tmp/rdsd.sock)" << endl;
 	cerr << "-n <srcnum>: Specify the RDS source number (see -e), default 0." << endl;
 	cerr << "-f specify file name to read from." << endl;
+	cerr << "-Ps <TCP/IP-Server>: Address/name of the machine where PosgreSQL is running." << endl;
+	cerr << "-Pp <portnum>: TCP/IP port where PosgreSQL is listening (default 5432)." << endl;
+	cerr << "-Pu <user>: PosgreSQL-User." << endl;
+	cerr << "-Px <password>: password of PosgreSQL-User." << endl;
+	cerr << "-Pn <dbname>: PosgreSQL-Database." << endl;
 }
 
 void RdsqOptions::show_version()
