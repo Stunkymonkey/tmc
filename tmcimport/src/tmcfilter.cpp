@@ -1,5 +1,6 @@
 #include "tmcfilter.h"
 #include <boost/tokenizer.hpp>
+#include <boost/algorithm/string.hpp>
 #include <iostream>
 
 using namespace std;
@@ -77,11 +78,23 @@ void TmcFilter::processLine(time_t time, std::string line, bool isNew) {
 	}
 	printEvent(time, line, isNew);
 
-	typedef boost::tokenizer<boost::char_separator<char> >
-	tokenizer;
-	boost::char_separator<char> sep(" ");
-	tokenizer tokens(line, sep);
-	for (tokenizer::iterator tok_iter = tokens.begin(); tok_iter != tokens.end(); ++tok_iter) {
-		//std::cout << *tok_iter << endl;
+	vector<string> strs;
+	// this splits the line into strs by spliting at '=' and spaces
+	boost::split(strs, line, boost::is_any_of(" ="));
+
+	if ((strs.size() == 13) && ((strs[0].compare("S")) == 0)) {
+		// single event
+		int a = stoi(strs[2]);
+		std::cout << a << endl;
+	} else if ((strs.size() == 11) && ((strs[0].compare("GF")) == 0)) {
+		// initial group event
+		int a = stoi(strs[2]);
+		std::cout << a << endl;
+	} else if ((strs.size() == 9) && ((strs[0].compare("GS")) == 0)) {
+		// following group events
+		int a = stoi(strs[2]);
+		std::cout << a << endl;
+	} else {
+		cerr << "Invalid format" << endl;
 	}
 }
