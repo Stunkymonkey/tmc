@@ -72,6 +72,7 @@ int main(int argc, char *argv[])
 	delete reader;
 
 	// remove for live
+	//TODO delete manager so mem-leak is no longer displayed
 	return 0;
 
 	RdsQueryHandler rds;

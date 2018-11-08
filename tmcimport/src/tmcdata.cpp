@@ -23,22 +23,17 @@ void TmcData::addChunk(string new_string) {
 	string header = *tok_iter;
 	tok_iter++;
 
-	// TODO find what time struct is wanted and create it
-	string time_str;
+	time_t rawtime;
+	// if line provides time use it or create it
 	if (header.length() ==24) {
-		time_str = header.substr(5, 19);
-		// cout << time_str << endl;
+		string time_str = header.substr(5, 19);
+		struct tm tm;
+		strptime(time_str.c_str(), "%FT%T", &tm);
+		rawtime = mktime(&tm);
 	} else {
-		time_t rawtime;
-		struct tm * timeinfo;
-		char buffer[20];
-
+		// TODO test
 		time (&rawtime);
-		timeinfo = localtime(&rawtime);
-		strftime(buffer, sizeof(buffer), "%FT%T", timeinfo);
-		time_str = buffer;
 	}
-	// std::get_time()
 
 	vector<string>::iterator it = old_strings.begin();
 
@@ -48,22 +43,44 @@ void TmcData::addChunk(string new_string) {
 			it++;
 		} else {
 			// removed lines
-			old_line(time_str, *it);
+			processLine(rawtime, *it, false);
 			old_strings.erase(it);
 		}
 	}
 	while (tok_iter != tokens.end()) {
 		// new lines
 		old_strings.push_back(*tok_iter);
-		new_line(time_str, *tok_iter);
+		processLine(rawtime, *tok_iter, true);
 		tok_iter++;
 	}
 }
 
+void TmcData::printEvent(time_t time, std::string line, bool isNew) {
+	// debug helper
+	struct tm * timeinfo;
+	char buffer[80];
+	timeinfo = localtime(&time);
 
-void TmcData::new_line(std::string time_str, std::string new_line) {
-	cout << time_str <<"\tnew:\t\t" << new_line << endl;
+	strftime(buffer,sizeof(buffer),"%FT%T",timeinfo);
+	std::string time_str(buffer);
+	if (isNew) {
+		cout << time_str <<"\tnew:\t" << line << endl;
+	} else {
+		cout << time_str <<"\told:\t" << line << endl;
+	}
 }
-void TmcData::old_line(std::string time_str, std::string old_line) {
-	cout << time_str << "\tremove:\t\t" << old_line << endl;
+
+
+void TmcData::processLine(time_t time, std::string line, bool isNew) {
+	if (line.front() == 'Y') {
+		return;
+	}
+	printEvent(time, line, isNew);
+
+	typedef boost::tokenizer<boost::char_separator<char> >
+	tokenizer;
+	boost::char_separator<char> sep(" ");
+	tokenizer tokens(line, sep);
+	for (tokenizer::iterator tok_iter = tokens.begin(); tok_iter != tokens.end(); ++tok_iter)
+		std::cout << *tok_iter << endl;
 }
