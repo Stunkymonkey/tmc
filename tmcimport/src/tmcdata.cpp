@@ -67,7 +67,18 @@ void TmcData::startSingleEvent(time_t time, int loc, int event, int ext, bool di
 }
 
 void TmcData::endSingleEvent(time_t time, int loc, int event, int ext, bool dir) {
+	if (!C->is_open()) {
+		cout << "Database closed unexpected" << endl;
+		return;
+	}
 
+	string sql = 	"UPDATE events " \
+					"SET \"end\" = to_timestamp(" + to_string(time) + ") " \
+					"WHERE (lcd = " + to_string(loc) + ") AND (\"end\" IS NULL);";
+
+	work W(*C);
+	W.exec( sql );
+	W.commit();
 }
 
 int TmcData::startGroupEvent(time_t time, int loc, int event, int ext, bool dir) {
@@ -77,7 +88,6 @@ int TmcData::startGroupEvent(time_t time, int loc, int event, int ext, bool dir)
 		return 0;
 	}
 
-	// TODO get correct id with query
 	string sql = 	"INSERT INTO events (\"start\", \"end\", lcd, event, extension, dir_positive) " \
 					"VALUES ( " \
 					"to_timestamp(" + to_string(time) + "), " \
@@ -85,19 +95,50 @@ int TmcData::startGroupEvent(time_t time, int loc, int event, int ext, bool dir)
 					"" + to_string(loc) + ", " \
 					"" + to_string(event) + ", " \
 					"" + to_string(ext) + ", " \
-					"" + to_string(dir) + "::BOOLEAN ); ";
+					"" + to_string(dir) + "::BOOLEAN ) " \
+					"RETURNING id;";
+
+	nontransaction N(*C);
+	result R( N.exec( sql ));
+
+	int id;
+	for (result::const_iterator c = R.begin(); c != R.end(); ++c) {
+		id = c[0].as<int>();
+	}
+	return id;
+}
+
+void TmcData::endGroupEvent(time_t time, int loc, int event, int ext, bool dir) {
+	if (!C->is_open()) {
+		cout << "Database closed unexpected" << endl;
+		return;
+	}
+
+	string sql = 	"UPDATE events " \
+					"SET \"end\" = to_timestamp(" + to_string(time) + ") " \
+					"WHERE (lcd = " + to_string(loc) + ") AND (\"end\" IS NULL);";
 
 	work W(*C);
 	W.exec( sql );
 	W.commit();
-	// TODO get correct id with query
-	return 0;
-}
-
-void TmcData::endGroupEvent(time_t time, int loc, int event, int ext, bool dir) {
-
 }
 
 void TmcData::addGroupEventInfo(int id, int f1, int f2) {
+	if (!C->is_open()) {
+		cout << "Database closed unexpected" << endl;
+		return;
+	}
+	if (id == 0) {
+		return;
+	}
 
+	string sql = 	"INSERT INTO events_info (id, f1, f2) " \
+					"VALUES ( " \
+					"" + to_string(id) + ", " \
+					"" + to_string(f1) + ", " \
+					"" + to_string(f2) + "); ";
+
+	work W(*C);
+	W.exec( sql );
+	W.commit();
 }
