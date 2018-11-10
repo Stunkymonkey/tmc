@@ -63,8 +63,11 @@ int main(int argc, char *argv[])
 	if (! opts.ProcessCmdLine(argc, argv)) exit(1);
 
 	//TmcData *data = new TmcData(opts.GetDatabase());
-	string tmp = "asdf";
-	TmcData *data = new TmcData(tmp, tmp, tmp, tmp, tmp);
+	TmcData *data = new TmcData("tmc", "tmc", "asdf", "127.0.0.1", "5432");
+	cout << "test" << endl;
+	if (!data->checkConnection()) {
+		return 0;
+	}
 
 	TmcFilter *manager = new TmcFilter(data);
 
