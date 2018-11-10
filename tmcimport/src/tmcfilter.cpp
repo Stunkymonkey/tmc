@@ -1,12 +1,14 @@
-#include "tmcfilter.h"
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
 #include <iostream>
 
+#include "tmcfilter.h"
+
 using namespace std;
 
-TmcFilter::TmcFilter()
+TmcFilter::TmcFilter(TmcData* new_data)
 {
+	data = new_data;
 }
 
 TmcFilter::~TmcFilter()
@@ -82,18 +84,38 @@ void TmcFilter::processLine(time_t time, std::string line, bool isNew) {
 	// this splits the line into strs by spliting at '=' and spaces
 	boost::split(strs, line, boost::is_any_of(" ="));
 
+	// seperating by event
 	if ((strs.size() == 13) && ((strs[0].compare("S")) == 0)) {
 		// single event
-		int a = stoi(strs[2]);
-		std::cout << a << endl;
+		int event = stoi(strs[2]);
+		int loc = stoi(strs[4]);
+		int ext = stoi(strs[6]);
+		bool dir = stoi(strs[10]);
+		if (isNew) {
+			data->startSingleEvent(time, loc, event, ext, dir);
+		} else {
+			data->endSingleEvent(time, loc, event, ext, dir);
+		}
 	} else if ((strs.size() == 11) && ((strs[0].compare("GF")) == 0)) {
 		// initial group event
-		int a = stoi(strs[2]);
-		std::cout << a << endl;
+		int event = stoi(strs[2]);
+		int loc = stoi(strs[4]);
+		int ext = stoi(strs[6]);
+		int ci = stoi(strs[8]);
+		bool dir = stoi(strs[10]);
+		if (isNew) {
+			ci_index[ci - 1] = data->startGroupEvent(time, loc, event, ext, dir);
+		} else {
+			data->endGroupEvent(time, loc, event, ext, dir);
+		}
 	} else if ((strs.size() == 9) && ((strs[0].compare("GS")) == 0)) {
 		// following group events
-		int a = stoi(strs[2]);
-		std::cout << a << endl;
+		int ci = stoi(strs[2]);
+		int f1 = stoi(strs[6]);
+		int f2 = stoi(strs[8]);
+		if (isNew) {
+			data->addGroupEventInfo(ci_index[ci - 1], f1, f2);
+		}
 	} else {
 		cerr << "Invalid format" << endl;
 	}

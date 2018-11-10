@@ -9,6 +9,7 @@
 #include <csignal>
 #include <sstream>
 #include <stdio.h>
+
 #include "tmcioptions.h"
 #include "tmcqueryhandler.h"
 #include "tmcreader.h"
@@ -61,7 +62,11 @@ int main(int argc, char *argv[])
 	RdsqOptions opts;
 	if (! opts.ProcessCmdLine(argc, argv)) exit(1);
 
-	TmcFilter *manager = new TmcFilter();
+	//TmcData *data = new TmcData(opts.GetDatabase());
+	string tmp = "asdf";
+	TmcData *data = new TmcData(tmp, tmp, tmp, tmp, tmp);
+
+	TmcFilter *manager = new TmcFilter(data);
 
 	TmcReader *reader = new TmcReader(opts.GetFileName());
 
@@ -72,7 +77,7 @@ int main(int argc, char *argv[])
 	delete reader;
 
 	// remove for live
-	//TODO delete manager so mem-leak is no longer displayed
+	// TODO fix mem-leak in manager
 	return 0;
 
 	RdsQueryHandler rds;
