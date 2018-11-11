@@ -30,10 +30,8 @@ TmcData::~TmcData()
 bool TmcData::checkConnection() {
 	try {
 		if (C->is_open()) {
-			cout << "Opened database successfully: " << C->dbname() << endl;
 			return true;
 		} else {
-			cout << "Can't open database" << endl;
 			return false;
 		}
 	} catch (const std::exception &e) {
@@ -43,7 +41,20 @@ bool TmcData::checkConnection() {
 	return false;
 }
 
-void TmcData::insertLcd() {
+void TmcData::insertLcd(int id, float x, float y) {
+	if (!C->is_open()) {
+		cout << "Database closed unexpected" << endl;
+		return;
+	}
+
+	string sql = 	"INSERT INTO points (id, point) " \
+					"VALUES ( " \
+					"" + to_string(id) + ", " \
+					"ST_Point(" + to_string(x) + "," + to_string(y) + ")); ";
+
+	work W(*C);
+	W.exec( sql );
+	W.commit();
 }
 
 void TmcData::startSingleEvent(time_t time, int loc, int event, int ext, bool dir) {

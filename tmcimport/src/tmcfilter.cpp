@@ -6,13 +6,11 @@
 
 using namespace std;
 
-TmcFilter::TmcFilter(TmcData* new_data)
-{
+TmcFilter::TmcFilter(TmcData* new_data) {
 	data = new_data;
 }
 
-TmcFilter::~TmcFilter()
-{
+TmcFilter::~TmcFilter() {
 	old_strings.clear();
 }
 
@@ -78,7 +76,7 @@ void TmcFilter::processLine(time_t time, std::string line, bool isNew) {
 	if (line.front() == 'Y') {
 		return;
 	}
-	printEvent(time, line, isNew);
+	//printEvent(time, line, isNew);
 
 	vector<string> strs;
 	// this splits the line into strs by spliting at '=' and spaces

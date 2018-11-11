@@ -13,6 +13,7 @@
 #include "tmcioptions.h"
 #include "tmcqueryhandler.h"
 #include "tmcreader.h"
+#include "tmclcd.h"
 #include "tmcfilter.h"
 
 using namespace std;
@@ -62,10 +63,17 @@ int main(int argc, char *argv[])
 	RdsqOptions opts;
 	if (! opts.ProcessCmdLine(argc, argv)) exit(1);
 
-	//TmcData *data = new TmcData(opts.GetDatabase());
+	// TODO TmcData *data = new TmcData(opts.GetDatabase());
 	TmcData *data = new TmcData("tmc", "tmc", "asdf", "127.0.0.1", "5432");
-	cout << "test" << endl;
 	if (!data->checkConnection()) {
+		return 0;
+	}
+	// TODO manage via opts
+	if (false) {
+		TmcLcd *lcdImporter = new TmcLcd("./POINTS.DAT", data);
+		lcdImporter->readLines();
+		cout << "Successfully imported POINTS.DAT" << endl;
+		delete lcdImporter;
 		return 0;
 	}
 

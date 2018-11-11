@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <pqxx/pqxx>
 
@@ -6,7 +7,7 @@ public:
 	TmcData(std::string db_name, std::string user, std::string password, std::string hostaddr, std::string port);
 	~TmcData();
 	bool checkConnection();
-	void insertLcd();
+	void insertLcd(int id, float x, float y);
 	void startSingleEvent(time_t time, int loc, int event, int ext, bool dir);
 	void endSingleEvent(time_t time, int loc, int event, int ext, bool dir);
 	int startGroupEvent(time_t time, int loc, int event, int ext, bool dir);
