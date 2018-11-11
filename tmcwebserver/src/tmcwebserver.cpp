@@ -29,6 +29,8 @@
 #include <thread>
 #include <vector>
 
+#include "tmcjson.h"
+
 using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
 
@@ -160,14 +162,12 @@ handle_request(
 		res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
 		res.set(http::field::content_type, "application/json");
 		res.keep_alive(req.keep_alive());
+		//TODO replace with real psql results
+		long one = 1000000000;
+		long two = 1000010000;
+
 		boost::beast::ostream(res.body())
-		<< "{\n"
-		<< "\t\"min\": \""
-		//<<  min()
-		<< "\",\n"
-		<< "\t\"max\": \""
-		//<<  max()
-		<<  "\"\n}\n";
+		<< TmcJson::min_max_date(&one, &two);
 		return send(std::move(res));
 	}
 	else if(req.method() == http::verb::post && req.target() == "/query")
@@ -177,18 +177,7 @@ handle_request(
 		res.set(http::field::content_type, "application/json");
 		res.keep_alive(req.keep_alive());
 		boost::beast::ostream(res.body())
-		<< "{\n"
-		// execute query
-		// iterate and generate json
-		<< "\t\"event\": {"
-		//<<  lala
-		<< "\n\t\t\"lat\": "
-		<< 12
-		<< ",\n\t\t\"long\": "
-		<< 13
-		<< "\n\t},\n"
-		//<<  lala
-		<< "}\n";
+		<< TmcJson::query();
 		return send(std::move(res));
 	}
 	else if(req.method() == http::verb::post)

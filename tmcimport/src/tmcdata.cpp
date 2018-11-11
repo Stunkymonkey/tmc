@@ -38,7 +38,6 @@ bool TmcData::checkConnection() {
 		cerr << e.what() << std::endl;
 		return false;
 	}
-	return false;
 }
 
 void TmcData::insertLcd(int id, float x, float y) {
