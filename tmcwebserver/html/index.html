@@ -17,14 +17,18 @@
             Start:
         </label>
         <input type="date" id="start-time" value="2018-08-22" min="2018-08-22" max="2019-08-22" required />
-        <br>
+        <!-- <br> -->
         <label>
             End:
         </label>
         <input type="date" id="end-time" value="2018-08-23" min="2018-08-22" max="2019-08-22" required />
+        <h4>Filter</h4>
+        <input type="checkbox" id="morgen" name="Morgen" checked>
+        <input type="checkbox" id="mittag" name="Mittag" checked>
+        <input type="checkbox" id="abend" name="Abend" checked>
+        <input type="checkbox" id="nacht" name="Nacht" checked>
         <br>
         <button class="search" onclick="search()">Search</button>
-        <br>
         <button class="overlay" onclick="overlay()">Draw Overlay</button>
     </div>
     <div id="animate">
@@ -33,7 +37,7 @@
             <label for="playPauseCheckbox"></label>
         </div>
         <div class="slidecontainer">
-            <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+            <input type="range" min="1" max="100" value="0" step="0.1" class="slider" id="myRange">
         </div>
         <div class="speed">
             Speed:<br>
