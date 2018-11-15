@@ -109,7 +109,6 @@ label{
 	float: left;
 	clear: left;
 	width: 50px;
-	text-align: right;
 }
 input[type=date] {
 	display: inline-block;

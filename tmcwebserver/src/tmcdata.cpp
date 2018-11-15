@@ -40,31 +40,63 @@ bool TmcData::checkConnection() {
 	}
 }
 
-int TmcData::startGroupEvent(time_t time, int loc, int event, int ext, bool dir) {
+tuple<std::string, std::string> TmcData::minMaxDate() {
 	// return id of event, because it is needed for additional group infos
 	if (!C->is_open()) {
 		cout << "Database closed unexpected" << endl;
-		return 0;
+		return make_tuple("", "");
 	}
 
-	string sql = 	"INSERT INTO events (\"start\", \"end\", lcd, event, extension, dir_positive) " \
-					"VALUES ( " \
-					"to_timestamp(" + to_string(time) + "), " \
-					"NULL, " \
-					"" + to_string(loc) + ", " \
-					"" + to_string(event) + ", " \
-					"" + to_string(ext) + ", " \
-					"" + to_string(dir) + "::BOOLEAN ) " \
-					"RETURNING id;";
+	string sql = "SELECT MIN(\"start\"), MAX(\"end\") FROM events;";
 
 	nontransaction N(*C);
 	result R( N.exec( sql ));
 
-	int id;
+	std::string min;
+	std::string max;
 	for (result::const_iterator c = R.begin(); c != R.end(); ++c) {
-		id = c[0].as<int>();
+		min = c[0].as<std::string>();
+		max = c[1].as<std::string>();
 	}
-	return id;
+	return make_tuple(min, max);
 }
 
+string TmcData::query(double northEastLat, double  northEastLng, double southWestLat, double southWestLng, string start, string end) {
+	// return id of event, because it is needed for additional group infos
+	std::vector<int> events;
+	if (!C->is_open()) {
+		cout << "Database closed unexpected" << endl;
+		return "";
+	}
 
+	string sql =	"SELECT ST_AsText(points.point), "
+							"events.id, "
+							"events.event, "
+							"events.start, "
+							"events.\"end\", "
+							"events.extension, "
+							"events.dir_positive "
+					"FROM points "
+					"INNER JOIN events ON events.lcd = points.id "
+					"WHERE ST_Contains(ST_MakeEnvelope( "
+						+ to_string(southWestLng) + ", "
+						+ to_string(southWestLat) + ", "
+						+ to_string(northEastLng) + ", "
+						+ to_string(northEastLat) +
+					"), points.point) "
+					"AND '" + start + "' <= events.start "
+					"AND '" + end + "' >= events.\"end\";";
+	// TODO check if string-date really works here
+
+	nontransaction N(*C);
+	result R( N.exec( sql ));
+
+	std::string point;
+	std::string id;
+	for (result::const_iterator c = R.begin(); c != R.end(); ++c) {
+		point = c[0].as<std::string>();
+		id = c[1].as<std::string>();
+		cout << point << " " << id << endl;
+	}
+	return "";
+}

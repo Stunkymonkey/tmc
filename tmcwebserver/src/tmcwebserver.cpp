@@ -30,9 +30,11 @@
 #include <vector>
 
 #include "tmcjson.h"
+#include "tmcdata.h"
 
 using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
+TmcData *data;
 
 // Return a reasonable mime type based on the extension of a file.
 boost::beast::string_view
@@ -162,9 +164,11 @@ handle_request(
 		res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
 		res.set(http::field::content_type, "application/json");
 		res.keep_alive(req.keep_alive());
-		//TODO replace with real psql results
-		long one = 1000000000;
-		long two = 1000010000;
+
+		// TODO when error
+		std::tuple<std::string, std::string> range = data->minMaxDate();
+		std::string one = std::get<0>(range);
+		std::string two = std::get<1>(range);
 
 		boost::beast::ostream(res.body())
 		<< TmcJson::min_max_date(&one, &two);
@@ -176,8 +180,26 @@ handle_request(
 		res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
 		res.set(http::field::content_type, "application/json");
 		res.keep_alive(req.keep_alive());
+
+		double northEastLat;
+		double northEastLng;
+		double southWestLat;
+		double southWestLng;
+		std::string start;
+		std::string end;
+		bool valid_json = TmcJson::tmc_request(req.body(), northEastLat, northEastLng, southWestLat, southWestLng, start, end);
+		if (!valid_json) {
+			// TODO if not valid json return error
+			// return
+		}
+		std::string events = data->query(northEastLat, northEastLng, southWestLat, southWestLng, start, end);
+		// std::cout << northEastLat << " " << northEastLng << std::endl;
+		// std::cout << southWestLat << " " << southWestLng << std::endl;
+		// std::cout << start << " " << end << std::endl;
+
 		boost::beast::ostream(res.body())
-		<< TmcJson::query();
+		<< events;
+		// << TmcJson::tmc_query();
 		return send(std::move(res));
 	}
 	else if(req.method() == http::verb::post)
@@ -489,6 +511,11 @@ int main(int argc, char* argv[])
 	auto const port = static_cast<unsigned short>(std::atoi(argv[2]));
 	auto const doc_root = std::make_shared<std::string>(argv[3]);
 	auto const threads = std::max<int>(1, std::atoi(argv[4]));
+
+	data = new TmcData("tmc", "tmc", "asdf", "127.0.0.1", "5432");
+	if (!data->checkConnection()) {
+		return 42;
+	}
 
 	// The io_context is required for all I/O
 	boost::asio::io_context ioc{threads};
