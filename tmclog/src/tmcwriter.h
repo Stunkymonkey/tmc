@@ -1,13 +1,12 @@
 #include <string>
 #include <fstream>
 
-using namespace std;
-
 class RdsWriter{
 public:
-	RdsWriter(string filename, bool append);
+	RdsWriter(std::string filename, bool append);
 	~RdsWriter();
-	bool write(string s);
+	bool write(std::string s);
 private:
-	ofstream myfile;
+	std::ofstream myfile;
+	std::string last_s = "";
 };

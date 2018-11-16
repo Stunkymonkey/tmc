@@ -6,7 +6,7 @@
 #@echo "$$ANNOUNCE_BODY"
 
 .PHONY: all
-all: rds rdslog tmcimport tmcwebserver
+all: rds tmclog tmcimport tmcwebserver
 
 .PHONY: rds librds rdsquery rdsd
 rds: librds rdsquery rdsd
@@ -23,10 +23,10 @@ rdsd: rds/rdsd/src/rdsd
 rds/rdsd/src/rdsd:
 	$(MAKE) -C rds/rdsd
 
-.PHONY: rdslog
-rdslog: rdslog/src/rdslog
-rdslog/src/rdslog: librds
-	$(MAKE) -C rdslog
+.PHONY: tmclog
+tmclog: tmclog/src/tmclog
+tmclog/src/tmclog: librds
+	$(MAKE) -C tmclog
 
 .PHONY: tmcimport
 tmcimport: tmcimport/src/tmcimport
@@ -39,8 +39,8 @@ tmcwebserver/src/tmcwebserver:
 	$(MAKE) -C tmcwebserver
 
 
-.PHONY: clean clean-rds clean-rdslog clean-tmcimport clean-tmcwebserver
-clean: clean-rds clean-rdslog clean-tmcimport clean-tmcwebserver
+.PHONY: clean clean-rds clean-tmclog clean-tmcimport clean-tmcwebserver
+clean: clean-rds clean-tmclog clean-tmcimport clean-tmcwebserver
 
 .PHONY: clean-librds clean-rdsquery clean-rdsd
 clean-rds: clean-librds clean-rdsquery clean-rdsd
@@ -51,9 +51,9 @@ clean-rdsquery:
 clean-rdsd:
 	$(MAKE) -C rds/rdsd clean
 
-.PHONY: clean-rdslog
-clean-rdslog:
-	$(MAKE) -C rdslog clean
+.PHONY: clean-tmclog
+clean-tmclog:
+	$(MAKE) -C tmclog clean
 
 .PHONY: clean-tmcimport
 clean-tmcimport:
@@ -65,7 +65,7 @@ clean-tmcwebserver:
 
 
 .PHONY: install install-rds install-librds install-rdsquery install-rdsd
-install: install-rds install-server install-rdslog install-tmcimport install-tmcwebserver
+install: install-rds install-server install-tmclog install-tmcimport install-tmcwebserver
 install-rds: install-librds install-rdsquery install-rdsd
 install-librds:
 	$(MAKE) -C rds/librds install
@@ -74,9 +74,9 @@ install-rdsquery:
 install-rdsd:
 	$(MAKE) -C rds/rdsd install
 
-.PHONY: install-rdslog
-install-rdslog:
-	$(MAKE) -C rdslog install
+.PHONY: install-tmclog
+install-tmclog:
+	$(MAKE) -C tmclog install
 
 .PHONY: install-tmcimport
 install-tmcimport:

@@ -31,7 +31,13 @@ bool RdsWriter::write(string s) {
 	std::string str_time(buffer);
 
 	if (!myfile.is_open()) return false;
-	myfile << "tmc: " << str_time << endl;
-	myfile << s << endl;
+
+	if (s == last_s) {
+		myfile << "dup: " << str_time << endl;
+	} else {
+		myfile << "tmc: " << str_time << endl;
+		myfile << s << endl;
+	}
+	last_s = s;
 	return true;
 }
