@@ -17,6 +17,7 @@ using namespace std;
 
 RDSConnectionHandle hnd = 0;
 string my_unix_sock = "";
+TmcWriter *writer;
 
 void show_debug(RDSConnectionHandle hnd)
 {
@@ -47,6 +48,7 @@ static void sig_proc(int signr)
 			cerr << "closing connection, ";
 			rds_close_connection(hnd);
 			rds_delete_connection_object(hnd);
+			writer->~TmcWriter();
 		}
 		cerr << "exiting." << endl;
 		exit(1);
@@ -98,7 +100,7 @@ int main(int argc, char *argv[])
 		clean_exit(hnd);
 	}
 
-	RdsWriter *writer = new RdsWriter(opts.GetFileName(), opts.IsAppendMode());
+	writer = new TmcWriter(opts.GetFileName(), opts.IsAppendMode());
 
 	while (RDS_OK == rds_get_event(hnd,opts.GetSourceNum(),&events)){
 		if (events & RDS_EVENT_TMC) {

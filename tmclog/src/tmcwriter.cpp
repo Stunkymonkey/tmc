@@ -4,22 +4,26 @@
 
 using namespace std;
 
-RdsWriter::RdsWriter(string filename, bool append)
+TmcWriter::TmcWriter(string filename, bool append)
 {
+	// TODO test append mode
+	std::ios_base::openmode bitmask = std::ios_base::binary;
 	if (append) {
-		myfile.open (filename, ios_base::app);
+		bitmask |= std::ios_base::app;
 	} else {
-		myfile.open (filename);
+		bitmask |= std::ios_base::out;
 	}
-	
+	boost::iostreams::file_sink myCprdFile(filename, bitmask);
+	bzip2Filter.push(boost::iostreams::bzip2_compressor());
+	bzip2Filter.push(myCprdFile);
 }
 
-RdsWriter::~RdsWriter()
+TmcWriter::~TmcWriter()
 {
-	myfile.close();
+	boost::iostreams::close(bzip2Filter);
 }
 
-bool RdsWriter::write(string s) {
+bool TmcWriter::write(string s) {
 	time_t rawtime;
 	struct tm * timeinfo;
 	char buffer[80];
@@ -30,13 +34,18 @@ bool RdsWriter::write(string s) {
 	strftime(buffer,sizeof(buffer),"%FT%T",timeinfo);
 	std::string str_time(buffer);
 
-	if (!myfile.is_open()) return false;
+	if (!bzip2Filter.good()) return false;
 
+	// the last char is always some weird char, so remove it
+	s.pop_back();
 	if (s == last_s) {
-		myfile << "dup: " << str_time << endl;
+		cout << "dup: " << str_time << endl;
+		bzip2Filter << "dup: " << str_time << endl;
 	} else {
-		myfile << "tmc: " << str_time << endl;
-		myfile << s << endl;
+		cout << "tmc: " << str_time << endl;
+		bzip2Filter << "tmc: " << str_time << endl;
+		cout << s << endl;
+		bzip2Filter << s << endl;
 	}
 	last_s = s;
 	return true;
