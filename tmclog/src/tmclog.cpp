@@ -9,9 +9,9 @@
 #include <csignal>
 #include <sstream>
 #include <stdio.h>
-#include "rdsloptions.h"
-#include "rdsqueryhandler.h"
-#include "rdswriter.h"
+#include "tmcloptions.h"
+#include "tmcqueryhandler.h"
+#include "tmcwriter.h"
 
 using namespace std;
 

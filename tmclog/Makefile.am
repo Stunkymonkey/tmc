@@ -3,5 +3,5 @@
 AUTOMAKE_OPTIONS = foreign 1.4
 
 SUBDIRS = src
-EXTRA_DIST = Doxyfile rdslog.1
-man_MANS = rdslog.1
+EXTRA_DIST = Doxyfile tmclog.1
+man_MANS = tmclog.1

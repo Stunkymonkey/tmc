@@ -36,7 +36,7 @@ POFFSETS.DAT
 points.json
 poffsets.json
 
-rdslog/src/rdslog
+tmclog/src/tmclog
 tmcimport/src/tmcimport
 tmcwebserver/src/tmcwebserver
 

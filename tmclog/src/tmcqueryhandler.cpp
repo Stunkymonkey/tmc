@@ -1,4 +1,4 @@
-#include "rdsqueryhandler.h"
+#include "tmcqueryhandler.h"
 #include <iostream>
 #include <cstdlib>
 

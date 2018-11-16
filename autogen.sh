@@ -7,7 +7,7 @@ for folder in \
   "${BASE}/rds/librds/" \
   "${BASE}/rds/rdsquery/" \
   "${BASE}/rds/rdsd/" \
-  "${BASE}/rdslog/" \
+  "${BASE}/tmclog/" \
   "${BASE}/tmcimport/" \
   "${BASE}/tmcwebserver/" \
   ; do

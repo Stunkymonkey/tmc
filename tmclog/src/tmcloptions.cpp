@@ -2,7 +2,7 @@
 #include <config.h>
 #endif
 
-#include "rdsloptions.h"
+#include "tmcloptions.h"
 #include <unistd.h>
 #include <iostream>
 #include <cstdlib>

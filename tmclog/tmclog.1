@@ -1,24 +1,24 @@
-.TH "rdslog" "1" "0.1.0" "Hans J. Koch" "Radio Data System data logging program"
+.TH "tmclog" "1" "0.1.0" "Hans J. Koch" "Radio Data System data logging program"
 .SH "NAME"
 .LP 
-rdslog \- commandline tool to query data from a Radio Data System
+tmclog \- commandline tool to query data from a Radio Data System
 daemon (rdsd).
 
 This is a preliminary man page for the pre\-Alpha
-development version of rdslog. Not everything described
+development version of tmclog. Not everything described
 in here necessarily works yet! Parameters might change
-before rdslog becomes stable.
+before tmclog becomes stable.
 .SH "SYNTAX"
 .LP 
-rdslog [\fIoptions\fP]
+tmclog [\fIoptions\fP]
 
 .SH "DESCRIPTION"
 .LP 
-rdslog is a client application to read decoded
+tmclog is a client application to read decoded
 Radio Data System (RDS) data from a RDS daemon (rdsd).
 It connects to rdsd via TCP/IP or a unix domain socket.
 .LP 
-rdslog uses librds for the lowlevel communication routines
+tmclog uses librds for the lowlevel communication routines
 and therefore depends on the librds package.
 
 .SH "OPTIONS"
@@ -48,7 +48,7 @@ Output some help text.
 Output version information and exit.
 .SH "FILES"
 .LP 
-None, rdslog is solely configured through commandline options.
+None, tmclog is solely configured through commandline options.
 
 .SH "AUTHORS"
 .LP 
