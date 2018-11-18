@@ -1,6 +1,8 @@
 body {
 	margin: 0;
 	padding: 0;
+	font-size: 16px;
+	font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
 }
 
 #map {
@@ -14,8 +16,9 @@ body {
 	position: absolute;
 	top: 8px;
 	right: 8px;
-	padding: 6px 8px;
+	padding: 20px;
 	background: rgba(255,255,255,0.9);
+	color: #282828;
 	border-radius: 5px;
 	width: 200px;
 	z-index: 1000;
@@ -23,7 +26,6 @@ body {
 
 #info h4 {
 	margin: 0 0 0;
-	color: #777;
 }
 
 #animate {
@@ -36,6 +38,24 @@ body {
 	z-index: 1000;
 	display: flex;
 	align-items: center;
+}
+#animate > * {
+	margin: 0 1em;
+}
+
+.input-wrapper {
+	margin: 0.8em 0;
+}
+
+.info-button {
+	display: block;
+	background-color: #2b5696;
+	color: white;
+	border-style: none;
+	border-radius: 3px;
+	padding: 5px 10px;
+	margin-top: 0.8em;
+	width: 100%;
 }
 
 .speed {
@@ -72,47 +92,43 @@ body {
 }
 
 .slider {
-	margin-left: 0px;
-	margin-right: 0px;
-	-webkit-appearance: none;
 	width: 100%;
-	height: 50px;
-	border-radius: 5px;
 	outline: none;
-	opacity: 0.7;
-	-webkit-transition: .2s;
-	transition: opacity .2s;
+	margin-left: 0;
+}
+.slider::-moz-focus-outer {
+	border-style: none;
 }
 .slider::-webkit-slider-thumb {
 	-webkit-appearance: none;
 	appearance: none;
-	width: 15px;
-	height: 15px;
+	width: 20px;
+	height: 20px;
 	border-radius: 50%;
 	background: #1b1b1b;
 	cursor: pointer;
 }
 .slider::-moz-range-thumb {
-	width: 15px;
-	height: 15px;
+	width: 20px;
+	height: 20px;
 	border-radius: 50%;
 	background: #1b1b1b;
 	cursor: pointer;
+	border-style: none;
+	outline: none;
 }
 
 input[type=number]{
-	width: 80px;
+	width: 45px;
 }
 
 label{
 	display: inline-block;
-	float: left;
-	clear: left;
 	width: 50px;
+	font-size: 0.9rem;
 }
 input[type=date] {
 	display: inline-block;
-	float: left;
 }
 
 input[type=submit] {
