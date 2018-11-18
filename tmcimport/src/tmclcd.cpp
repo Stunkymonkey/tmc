@@ -6,13 +6,13 @@
 
 using namespace std;
 
-TmcLcd::TmcLcd(string filename, TmcData* new_data) {
+TmcLcd::TmcLcd(string points, string poffset, TmcData* new_data) {
 	data = new_data;
 
-	in = std::ifstream(filename);
+	in = std::ifstream(points);
 
 	if(!in) {
-		cerr << "Cannot open " + filename + " file.\n";
+		cerr << "Cannot open " + points + " file.\n";
 	}
 
 	char header[300];

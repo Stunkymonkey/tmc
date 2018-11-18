@@ -69,7 +69,7 @@ void TmcData::startSingleEvent(time_t time, int loc, int event, int ext, bool di
 					"" + to_string(loc) + ", " \
 					"" + to_string(event) + ", " \
 					"" + to_string(ext) + ", " \
-					"" + to_string(dir) + "::BOOLEAN ); ";
+					"" + to_string(dir) + "::BOOLEAN); ";
 
 	work W(*C);
 	W.exec( sql );
@@ -84,7 +84,9 @@ void TmcData::endSingleEvent(time_t time, int loc, int event, int ext, bool dir)
 
 	string sql = 	"UPDATE events " \
 					"SET \"end\" = to_timestamp(" + to_string(time) + ") " \
-					"WHERE (lcd = " + to_string(loc) + ") AND (\"end\" IS NULL);";
+					"WHERE (lcd = " + to_string(loc) + ") AND (\"end\" IS NULL) " \
+					"AND (extension = " + to_string(ext) + ") " \
+					"AND (dir_positive = " + to_string(dir) + "::BOOLEAN);";
 
 	work W(*C);
 	W.exec( sql );

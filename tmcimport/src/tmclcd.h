@@ -5,7 +5,7 @@
 
 class TmcLcd{
 public:
-	TmcLcd(std::string filename, TmcData* new_data);
+	TmcLcd(std::string points, std::string poffset, TmcData* new_data);
 	~TmcLcd();
 	void readLines();
 	void addLine(std::string new_line);

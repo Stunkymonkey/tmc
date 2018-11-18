@@ -6,8 +6,8 @@ TmcReader::TmcReader(string filename)
 {
 	boost::iostreams::file_source myCprdFile (filename, std::ios_base::in | std::ios_base::binary);
 
-	bunzip2Filter.push (boost::iostreams::bzip2_decompressor());
-	bunzip2Filter.push (myCprdFile);
+	bunzip2Filter.push(boost::iostreams::bzip2_decompressor());
+	bunzip2Filter.push(myCprdFile);
 }
 
 TmcReader::~TmcReader()
@@ -31,20 +31,19 @@ bool TmcReader::getChunk(string &result) {
 		cout << "file is read" << endl;
 		return false;
 	}
-	// check if next line begins with "tmc:" (only checking t)
-	if (peekChar() != 't') {
-		cout << "weird chunk" << endl;
-		return false;
-	}
-	// if it does read until next "t" appears
-	result = "";
 	bool status = false;
+	result = "";
+	// the next line is the tmc line conataining the timestamp
 	read(result);
-	while(peekChar() != 't' && peekChar() != EOF) {
+	string tmp;
+	while(peekChar() != 't' && peekChar() != 'd' && peekChar() != EOF) {
 		result.append("\n");
-		string tmp;
 		status = read(tmp);
 		result.append(tmp);
+	}
+	// skip all duplicates and next read is at 't' or EOF
+	while(peekChar() == 'd' && peekChar() != EOF) {
+		read(tmp);
 	}
 	return status;
 }

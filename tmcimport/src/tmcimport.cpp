@@ -66,11 +66,11 @@ int main(int argc, char *argv[])
 	// TODO TmcData *data = new TmcData(opts.GetDatabase());
 	TmcData *data = new TmcData("tmc", "tmc", "asdf", "127.0.0.1", "5432");
 	if (!data->checkConnection()) {
-		return 0;
+		return 42;
 	}
 	// TODO manage via opts
 	if (false) {
-		TmcLcd *lcdImporter = new TmcLcd("./POINTS.DAT", data);
+		TmcLcd *lcdImporter = new TmcLcd("./POINTS.DAT", "./POFFSETS.DAT", data);
 		lcdImporter->readLines();
 		cout << "Successfully imported POINTS.DAT" << endl;
 		delete lcdImporter;
@@ -82,7 +82,10 @@ int main(int argc, char *argv[])
 	TmcReader *reader = new TmcReader(opts.GetFileName());
 
 	string chunk = "";
+	int i = 0;
 	while (reader->getChunk(chunk)) {
+		std::cout << i << std::endl;
+		i ++;
 		manager->addChunk(chunk);
 	}
 	delete reader;

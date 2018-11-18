@@ -73,7 +73,9 @@ void TmcFilter::printEvent(time_t time, std::string line, bool isNew) {
 
 
 void TmcFilter::processLine(time_t time, std::string line, bool isNew) {
-	if (line.front() == 'Y') {
+	// Y displays the current sender
+	// T is an encrypted message
+	if (line.front() == 'Y' || line.front() == 'T') {
 		return;
 	}
 	//printEvent(time, line, isNew);
