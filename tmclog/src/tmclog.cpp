@@ -44,20 +44,27 @@ static void sig_proc(int signr)
 {
 	if (signr == SIGINT){
 		cerr << "Caught SIGINT, ";
-		if (hnd) {
-			cerr << "closing connection, ";
-			rds_close_connection(hnd);
-			rds_delete_connection_object(hnd);
-			writer->~TmcWriter();
-		}
-		cerr << "exiting." << endl;
-		exit(1);
+	} else if (signr == SIGTERM){
+		cerr << "Caught SIGTERM, ";
+	} else if (signr == SIGQUIT){
+		cerr << "Caught SIGQUIT, ";
 	}
+	if (hnd) {
+		cerr << "closing connection, ";
+		rds_close_connection(hnd);
+		rds_delete_connection_object(hnd);
+		cerr << "writing to file, ";
+		writer->~TmcWriter();
+	}
+	cerr << "exiting." << endl;
+	exit(1);
 }
 
 int main(int argc, char *argv[])
 {
 	signal(SIGINT,sig_proc);
+	signal(SIGTERM,sig_proc);
+	signal(SIGQUIT,sig_proc);
 
 	RdsqOptions opts;
 	if (! opts.ProcessCmdLine(argc,argv)) exit(1);
