@@ -7,7 +7,10 @@ public:
 	TmcData(std::string db_name, std::string user, std::string password, std::string hostaddr, std::string port);
 	~TmcData();
 	bool checkConnection();
+	// LCL based
 	void insertLcd(int id, float x, float y);
+	void insertOffset(int lcd, int neg, int pos);
+	// event based
 	void startSingleEvent(time_t time, int loc, int event, int ext, bool dir);
 	void endSingleEvent(time_t time, int loc, int event, int ext, bool dir);
 	int startGroupEvent(time_t time, int loc, int event, int ext, bool dir);

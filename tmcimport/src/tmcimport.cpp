@@ -70,9 +70,14 @@ int main(int argc, char *argv[])
 	}
 	// TODO manage via opts
 	if (false) {
-		TmcLcd *lcdImporter = new TmcLcd("./POINTS.DAT", "./POFFSETS.DAT", data);
-		lcdImporter->readLines();
-		cout << "Successfully imported POINTS.DAT" << endl;
+		std::string points = "./POINTS.DAT";
+		std::string poffset = "./POFFSETS.DAT";
+		// data init database
+		TmcLCL *lcdImporter = new TmcLCL(points, poffset, data);
+		lcdImporter->readPoints();
+		cout << "Successfully imported " << points;
+		lcdImporter->readOffsets();
+		cout << " & " << poffset << endl;
 		delete lcdImporter;
 		return 0;
 	}

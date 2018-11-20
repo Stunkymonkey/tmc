@@ -56,6 +56,22 @@ void TmcData::insertLcd(int id, float x, float y) {
 	W.commit();
 }
 
+void TmcData::insertOffset(int lcd, int neg, int pos) {
+	if (!C->is_open()) {
+		cout << "Database closed unexpected" << endl;
+		return;
+	}
+
+	string sql = 	"INSERT INTO point_offset (lcd, negative, positive) " \
+					"VALUES ( " \
+					"" + to_string(lcd) + ", " \
+					"" + to_string(neg) + ", " \
+					"" + to_string(pos) + ");";
+	work W(*C);
+	W.exec( sql );
+	W.commit();
+}
+
 void TmcData::startSingleEvent(time_t time, int loc, int event, int ext, bool dir) {
 	if (!C->is_open()) {
 		cout << "Database closed unexpected" << endl;

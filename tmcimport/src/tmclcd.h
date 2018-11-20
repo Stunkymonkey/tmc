@@ -3,13 +3,16 @@
 
 #include "tmcdata.h"
 
-class TmcLcd{
+class TmcLCL{
 public:
-	TmcLcd(std::string points, std::string poffset, TmcData* new_data);
-	~TmcLcd();
-	void readLines();
-	void addLine(std::string new_line);
+	TmcLCL(std::string points, std::string poffset, TmcData* new_data);
+	~TmcLCL();
+	void readPoints();
+	void readOffsets();
 private:
+	void addPoint(std::string new_line);
+	void addOffset(std::string new_line);
 	TmcData *data;
-	std::ifstream in;
+	std::ifstream file_points;
+	std::ifstream file_poffset;
 };
