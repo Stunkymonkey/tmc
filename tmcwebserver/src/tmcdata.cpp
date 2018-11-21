@@ -84,19 +84,25 @@ string TmcData::query(double northEastLat, double  northEastLng, double southWes
 						+ to_string(northEastLng) + ", "
 						+ to_string(northEastLat) +
 					"), points.point) "
-					"AND '" + start + "' <= events.start "
-					"AND '" + end + "' >= events.\"end\";";
-	// TODO check if string-date really works here
+					"AND events.start >= '" + start + " 0:0' "
+					"AND events.\"end\" <='" + end + " 23:59:59.999999';";
+	// TODO use better < and add 1 to date
+	// TODO datenrange?
+	// @> 	contains range 	int4range(2,4) @> int4range(2,3)
+
+	cout << sql << endl;
 
 	nontransaction N(*C);
 	result R( N.exec( sql ));
 
 	std::string point;
 	std::string id;
+	std::string event;
 	for (result::const_iterator c = R.begin(); c != R.end(); ++c) {
 		point = c[0].as<std::string>();
 		id = c[1].as<std::string>();
-		cout << point << " " << id << endl;
+		event = c[2].as<std::string>();
+		cout << point << " " << id << " " << event << endl;
 	}
 	return "";
 }
