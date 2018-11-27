@@ -31,10 +31,12 @@
 
 #include "tmcjson.h"
 #include "tmcdata.h"
+#include "tmcresult.h"
 
 using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
 TmcData *data;
+
 
 // Return a reasonable mime type based on the extension of a file.
 boost::beast::string_view
@@ -192,14 +194,15 @@ handle_request(
 			// TODO if not valid json return error
 			// return
 		}
-		std::string events = data->query(northEastLat, northEastLng, southWestLat, southWestLng, start, end);
-		// std::cout << northEastLat << " " << northEastLng << std::endl;
-		// std::cout << southWestLat << " " << southWestLng << std::endl;
-		// std::cout << start << " " << end << std::endl;
+
+		std::vector<struct TmcResult*> out;
+		data->query(out, northEastLat, northEastLng, southWestLat, southWestLng, start, end);
+		std::string finalString = TmcJson::tmc_query(out);
+
+		std::cout << TmcJson::tmc_query(out) << std::endl;
 
 		boost::beast::ostream(res.body())
-		<< events;
-		// << TmcJson::tmc_query();
+		<< TmcJson::tmc_query(out);
 		return send(std::move(res));
 	}
 	else if(req.method() == http::verb::post)

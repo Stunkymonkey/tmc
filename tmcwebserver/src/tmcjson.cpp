@@ -4,11 +4,12 @@
 #include <ctime>
 
 #include "tmcjson.h"
+#include "tmcresult.h"
 
 using namespace std;
 namespace pt = boost::property_tree;
 
-string TmcJson::min_max_date(std::string *min, std::string *max) {
+std::string TmcJson::min_max_date(std::string *min, std::string *max) {
 	pt::ptree root;
 
 	root.put("min", *min);
@@ -40,8 +41,22 @@ bool TmcJson::tmc_request(string body, double& northEastLat, double& northEastLn
 	return true;
 }
 
-string TmcJson::tmc_query() {
+std::string TmcJson::tmc_query(std::vector<struct TmcResult*> out) {
 	pt::ptree root;
+
+	pt::ptree events;
+	for (std::vector<struct TmcResult*>::iterator it = out.begin() ; it != out.end(); ++it) {
+		TmcResult *tmp = *it;
+		pt::ptree event;
+
+		event.put("event", tmp->event);
+		event.put("start", tmp->start);
+		event.put("end", tmp->end);
+		event.put("path", tmp->path);
+		events.push_back(std::make_pair("", event));
+	}
+	root.add_child("events", events);
+
 	std::ostringstream oss;
 	pt::write_json(oss, root);
 	return oss.str();
