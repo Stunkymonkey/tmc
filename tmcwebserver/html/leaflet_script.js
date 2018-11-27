@@ -18,9 +18,6 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
 }).addTo(map);
 
 map.doubleClickZoom.disable();
-var lat, lat_goal, lat_start, lon, lon_start, lon_goal, lat_start_short, lat_goal_short, lon_start_short, lon_goal_short;
-var geojsonFeature;
-var geoObjectName;
 var isOverlayPointsDrawn = false;
 var isOverlayLinesDrawn = false;
 var points;
@@ -28,35 +25,6 @@ var lines;
 var url = "";
 
 var layerlist = {};
-
-//Called from SetStart/SetGoal. Creates GeoJson object for the start or goal and adds it to the map.
-function createGeo(lat, lon) {
-	geojsonFeature = {
-		"type": "Feature",
-		"properties": {
-			"name": geoObjectName,
-			"popupContent": "Long: " + lon.toFixed(3) + " Lat: " + lat.toFixed(3) + "<br>",
-			"lat": lat,
-			"lon": lon
-		},
-		"geometry": {
-			"type": "Point",
-			"coordinates": [lon, lat]
-		},
-
-	};
-	L.geoJson(geojsonFeature, {
-		pointToLayer: function (feature, latlng) {
-			return L.marker(latlng, {icon: myIcon});
-		},
-		onEachFeature: function(feature, layer) {
-			layerlist[feature.properties.name]=layer;
-			if (feature.properties && feature.properties.popupContent) {
-				layer.bindPopup(feature.properties.popupContent);
-			}
-		}
-	}).addTo(map);
-}
 
 //request
 function search() {
@@ -70,12 +38,9 @@ function search() {
 		}
 	};
 
-	console.log(map.getBounds());
 	var bounds = map.getBounds();
 	var start = document.getElementById("start-time").value;
 	var end = document.getElementById("end-time").value;
-	console.log(start);
-	console.log(end);
 	var body = {
 		"view": {
 			"northeast": bounds["_northEast"],
@@ -90,9 +55,14 @@ function search() {
 	console.log("request: " + data);
 	xhr.send(data);
 }
-//Called from sendData. Creates Geojsonobject for the received Route.
+//Called from search. Creates Geojsonobject for the received Route.
 function createGeoJson(json) {
-	console.log("answer: " + json.route);
+	console.log("answer: " + JSON.stringify(json));
+	for (var i = 0; i < json["events"].length; i++) {
+		console.log("event: " + json["events"][i]["event"]);
+		console.log("start: " + json["events"][i]["start"]);
+		console.log("end: " + json["events"][i]["end"]);
+	}
 	/*if (isGoalDrawn && isStartDrawn) {
 		isRouteDrawn = true;
 		var myLines = [{
