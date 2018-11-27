@@ -72,7 +72,7 @@ void TmcData::query(std::vector<struct TmcResult*>& out, double northEastLat, do
 	string sql =	"SELECT events.event, "
 							"events.start, "
 							"events.\"end\", "
-							"get_path(events.lcd, events.extension, events.dir_positive) AS \"path\" "
+							"get_path(events.lcd, events.extension, events.dir_negative) AS \"path\" "
 					"FROM points "
 					"INNER JOIN events ON events.lcd = points.id "
 					"WHERE ST_Contains(ST_MakeEnvelope("
@@ -81,8 +81,8 @@ void TmcData::query(std::vector<struct TmcResult*>& out, double northEastLat, do
 						+ to_string(northEastLng) + ", "
 						+ to_string(northEastLat) +
 					"), points.point) "
-					"AND events.start >= '" + start + " 0:0' "
-					"AND events.\"end\" <='" + end + " 23:59:59.999999';";
+					"AND events.start < '" + end + " 23:59' "
+					"AND events.\"end\" >='" + start + " 0:0';";
 	// TODO use better < and add 1 to date
 	// TODO datenrange?
 	// @> 	contains range 	int4range(2,4) @> int4range(2,3)
