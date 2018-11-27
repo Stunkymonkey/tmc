@@ -9,7 +9,7 @@ public:
 	~TmcData();
 	bool checkConnection();
 	std::tuple<std::string, std::string> minMaxDate();
-	std::string query(double northEastLat, double  northEastLng, double southWestLat, double southWestLng, std::string start, std::string end);
+	void query(std::vector<struct TmcResult*>& out, double northEastLat, double  northEastLng, double southWestLat, double southWestLng, std::string start, std::string end);
 private:
 	std::string dbConfig = "";
 	pqxx::connection* C;

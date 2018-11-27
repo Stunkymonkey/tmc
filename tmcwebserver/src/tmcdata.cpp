@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "tmcdata.h"
+#include "tmcresult.h"
 
 using namespace std;
 using namespace pqxx;
@@ -61,24 +62,20 @@ tuple<std::string, std::string> TmcData::minMaxDate() {
 	return make_tuple(min, max);
 }
 
-string TmcData::query(double northEastLat, double  northEastLng, double southWestLat, double southWestLng, string start, string end) {
+void TmcData::query(std::vector<struct TmcResult*>& out, double northEastLat, double  northEastLng, double southWestLat, double southWestLng, string start, string end) {
 	// return id of event, because it is needed for additional group infos
-	std::vector<int> events;
 	if (!C->is_open()) {
 		cout << "Database closed unexpected" << endl;
-		return "";
+		return;
 	}
 
-	string sql =	"SELECT ST_AsText(points.point), "
-							"events.id, "
-							"events.event, "
+	string sql =	"SELECT events.event, "
 							"events.start, "
 							"events.\"end\", "
-							"events.extension, "
-							"events.dir_positive "
+							"get_path(events.lcd, events.extension, events.dir_positive) AS \"path\" "
 					"FROM points "
 					"INNER JOIN events ON events.lcd = points.id "
-					"WHERE ST_Contains(ST_MakeEnvelope( "
+					"WHERE ST_Contains(ST_MakeEnvelope("
 						+ to_string(southWestLng) + ", "
 						+ to_string(southWestLat) + ", "
 						+ to_string(northEastLng) + ", "
@@ -95,14 +92,16 @@ string TmcData::query(double northEastLat, double  northEastLng, double southWes
 	nontransaction N(*C);
 	result R( N.exec( sql ));
 
-	std::string point;
-	std::string id;
-	std::string event;
+	// reserve size of result
+	out.reserve(R.size());
 	for (result::const_iterator c = R.begin(); c != R.end(); ++c) {
-		point = c[0].as<std::string>();
-		id = c[1].as<std::string>();
-		event = c[2].as<std::string>();
-		cout << point << " " << id << " " << event << endl;
+		TmcResult* tmp = new TmcResult();
+		// read all to TmcResult
+		tmp->event = c[0].as<std::string>();
+		tmp->start = c[1].as<std::string>();
+		tmp->end = c[2].as<std::string>();
+		tmp->path = c[3].as<std::string>();
+		out.push_back(tmp);
 	}
-	return "";
+	return;
 }
