@@ -8,4 +8,4 @@ AM_CPPFLAGS = $(all_includes)
 tmcwebserver_LDFLAGS = $(all_libraries)
 
 tmcwebserver_LDADD = -lboost_system -lpthread -lpqxx -lpq
-noinst_HEADERS = tmcjson.h tmcdata.h
+noinst_HEADERS = tmcjson.h tmcdata.h tmcresult.h
