@@ -1,6 +1,7 @@
 #include <iostream>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/algorithm/string.hpp>
 #include <ctime>
 
 #include "tmcjson.h"
@@ -52,9 +53,32 @@ std::string TmcJson::tmc_query(std::vector<struct TmcResult*> out) {
 		event.put("event", tmp->event);
 		event.put("start", tmp->start);
 		event.put("end", tmp->end);
-		event.put("path", tmp->path);
+
+		pt::ptree path;
+		vector<string> strs;
+		// this splits the path into strs by spliting at ',' and ':'
+		boost::split(strs, tmp->path, boost::is_any_of(",:"));
+
+		string longitude;
+		string latitude;
+		for(std::vector<string>::iterator it = strs.begin(); it != strs.end(); ++it) {
+			pt::ptree point;
+			// read point
+			longitude = *it;
+			++it;
+			latitude = *it;
+			// save it in point
+			point.put("long", longitude);
+			point.put("lat", latitude);
+			// add the point to the path
+			path.push_back(std::make_pair("", point));
+		}
+		event.add_child("path", path);
+
+		// add single event to events
 		events.push_back(std::make_pair("", event));
 	}
+	// make list of events
 	root.add_child("events", events);
 
 	std::ostringstream oss;
