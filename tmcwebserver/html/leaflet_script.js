@@ -72,8 +72,10 @@ function search() {
 
 	console.log(map.getBounds());
 	var bounds = map.getBounds();
-	var start = document.getElementById("start-time").getAttribute("value");
-	var end = document.getElementById("end-time").getAttribute("value");
+	var start = document.getElementById("start-time").value;
+	var end = document.getElementById("end-time").value;
+	console.log(start);
+	console.log(end);
 	var body = {
 		"view": {
 			"northeast": bounds["_northEast"],
