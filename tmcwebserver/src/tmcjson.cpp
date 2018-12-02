@@ -69,9 +69,9 @@ std::string TmcJson::tmc_query(std::vector<struct TmcResult*> out) {
 			++it;
 			latitude = *it;
 			// save it in point and add it
-			cell.put_value(latitude);
-			point.push_back(std::make_pair("", cell));
 			cell.put_value(longitude);
+			point.push_back(std::make_pair("", cell));
+			cell.put_value(latitude);
 			point.push_back(std::make_pair("", cell));
 			// add the point to the path
 			path.push_back(std::make_pair("", point));
