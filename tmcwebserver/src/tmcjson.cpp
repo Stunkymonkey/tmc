@@ -63,13 +63,16 @@ std::string TmcJson::tmc_query(std::vector<struct TmcResult*> out) {
 		string latitude;
 		for(std::vector<string>::iterator it = strs.begin(); it != strs.end(); ++it) {
 			pt::ptree point;
+			pt::ptree cell;
 			// read point
 			longitude = *it;
 			++it;
 			latitude = *it;
-			// save it in point
-			point.put("long", longitude);
-			point.put("lat", latitude);
+			// save it in point and add it
+			cell.put_value(latitude);
+			point.push_back(std::make_pair("", cell));
+			cell.put_value(longitude);
+			point.push_back(std::make_pair("", cell));
 			// add the point to the path
 			path.push_back(std::make_pair("", point));
 		}
