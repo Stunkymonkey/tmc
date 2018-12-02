@@ -1,10 +1,21 @@
+var url = "";
+var timeline;
+var slider;
+
 var bounds = [
     [47.2, 5.8], // Southwest coordinates
     [55.1, 15.4]  // Northeast coordinates
     ];
+
+var isOverlayPointsDrawn = false;
+var isOverlayLinesDrawn = false;
+var points;
+var lines;
+
 var map = new L.map('map', {
 	preferCanvas: true
 }).setView([48.7758, 9.1829], 13).setMaxBounds(bounds);
+map.doubleClickZoom.disable();
 
 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 	center: map.getBounds().getCenter(),
@@ -17,15 +28,6 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
 	zoom: 11,
 }).addTo(map);
 
-map.doubleClickZoom.disable();
-var isOverlayPointsDrawn = false;
-var isOverlayLinesDrawn = false;
-var points;
-var lines;
-var url = "";
-
-var layerlist = {};
-
 //request
 function search() {
 	var xhr = new XMLHttpRequest();
@@ -34,7 +36,8 @@ function search() {
 	xhr.onreadystatechange = function () {
 		if (xhr.readyState === 4 && xhr.status === 200) {
 			var json = JSON.parse(xhr.responseText);
-			createGeoJson(json);
+			data = createGeoJson(json);
+			addGeoJson(data);
 		}
 	};
 
@@ -52,41 +55,88 @@ function search() {
 		}
 	};
 	var data = JSON.stringify(body);
-	console.log("request: " + data);
+	// console.log("request: " + data);
 	xhr.send(data);
 }
-//Called from search. Creates Geojsonobject for the received Route.
-function createGeoJson(json) {
-	console.log("answer: " + JSON.stringify(json));
-	for (var i = 0; i < json["events"].length; i++) {
-		console.log("event: " + json["events"][i]["event"]);
-		console.log("start: " + json["events"][i]["start"]);
-		console.log("end: " + json["events"][i]["end"]);
-	}
-	/*if (isGoalDrawn && isStartDrawn) {
-		isRouteDrawn = true;
-		var myLines = [{
-			"type": "LineString",
-			"properties": {
-				"name": "line"
-			},
-			"coordinates": json.route
 
-		}];
-		L.geoJson(myLines, {
-			pointToLayer: function (feature, latlng) {
-				return L.marker(latlng, {icon: myIcon});
-			},
-			onEachFeature: function(feature, layer) {
-				layerlist[feature.properties.name]=layer;
-				if (feature.properties && feature.properties.popupContent) {
-					layer.bindPopup(feature.properties.popupContent);
+function addGeoJson(data) {
+	timeline = L.timeline(data, {
+		style: function(data){
+			return {
+				// stroke: false,
+				weight: 5,
+				color: getColorFor(data.properties.name),
+				fillOpacity: 0.5
 				}
-			}
-		}).addTo(map);
-	}*/
-	console.log("done painting");
+			},
+		// waitToUpdateMap: true,
+		showTicks : true,
+		onEachFeature: function(feature, layer) {
+			layer.bindTooltip(feature.properties.name);
+		}
+	});
+	slider.addTimelines(timeline);
+	timeline.addTo(map);
+	console.log("added all events");
 }
+
+//Called from search
+function createGeoJson(json) {
+	// console.log("answer: " + JSON.stringify(json));
+	events = []
+	for (var i = 0; i < json["events"].length; i++) {
+		// parse string to float, for a valid geojson
+		tmp = [];
+		for (var j = 0; j < json["events"][i]["path"].length; j++) {
+			tmp.push(json["events"][i]["path"][j].map(parseFloat));
+		}
+		// create geojson feature
+		events.push({
+			"type": "Feature",
+			"properties": {
+				"name": json["events"][i]["event"],
+				"start": json["events"][i]["start"],
+				"end": json["events"][i]["end"]
+			},
+			"geometry": {
+				"type": "LineString",
+				"coordinates": tmp
+			}
+		});
+		// console.log(json["events"][i]["path"]);
+	}
+	return {"type": "FeatureCollection", "features": events};
+}
+
+function addTimeLineControl() {
+	slider = L.timelineSliderControl({
+		formatOutput: function(date) {
+			return new Date(date).toLocaleDateString();
+		},
+		enableKeyboardControls: true,
+	});
+	slider.addTo(map);
+}
+
+function getColorFor(str) {
+	var hash = 0;
+	for (var i = 0; i < str.length; i++) {
+		hash = str.charCodeAt(i) + ((hash << 5) - hash);
+	}
+	var red = (hash >> 24) & 0xff;
+	var grn = (hash >> 16) & 0xff;
+	var blu = (hash >>  8) & 0xff;
+	return 'rgb(' + red + ',' + grn + ',' + blu + ')';
+}
+
+// function earthquakeColor(mag) {
+//     return mag > 5 ? '#FE6C00' :
+//            mag > 4  ? '#FCB230' :
+//            mag > 3 ? '#ECC918' :
+//            mag > 2 ? '#FCE46C' :
+//            mag > 1   ? '#F6E488' :
+//                       '#58D68D';
+// }
 
 function overlay() {
 	var xhr_o = new XMLHttpRequest();
@@ -142,13 +192,6 @@ function DrawOverlayPoints(json) {
 	console.log("done painting points");
 }
 
-function onEachFeature(feature, layer) {
-	// does this feature have a property named popupContent?
-	if (feature.properties && feature.properties.popupContent) {
-		layer.bindPopup(feature.properties.popupContent);
-	}
-}
-
 function dateRange() {
 	var xhr_p = new XMLHttpRequest();
 	xhr_p.open("GET", url + "date-range", true);
@@ -173,4 +216,6 @@ function setDateRange(json) {
 	document.getElementById("start-time").setAttribute('value', min);
 	document.getElementById("end-time").setAttribute('value', max);
 }
+
 dateRange();
+addTimeLineControl();

@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ==" crossorigin="" />
-<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js" integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log==" crossorigin=""></script>
-<link href="style.css" rel="stylesheet">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<link rel="stylesheet" href="leaflet.css" />
+<script src="leaflet.js" ></script>
+<script src="leaflet.timeline.js"></script>
+<link rel="stylesheet" href="style.css" />
 	
 <head>
 	<meta charset="UTF-8">
@@ -34,7 +35,7 @@
 		<button class="info-button search" onclick="search()">Search</button>
 		<button class="info-button overlay" onclick="overlay()">Draw Overlay</button>
 	</div>
-	<div id="animate">
+<!-- 	<div id="animate">
 		<div class="playpause">
 			<input type="checkbox" value="" id="playPauseCheckbox" name="playPauseCheckbox" checked />
 			<label for="playPauseCheckbox"></label>
@@ -48,9 +49,8 @@
 			</label>
 			<input type="number" id="speed" name="speed" value="1.0" placeholder="Speed" step="0.5" min="0.5" max="10" />
 		</div>
-	</div>
+	</div> -->
 	<div id="map"></div>
 	<script src="leaflet_script.js"></script>
 </body>
-
 </html>

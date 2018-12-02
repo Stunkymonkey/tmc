@@ -43,6 +43,16 @@ body {
 	margin: 0 1em;
 }
 
+.leaflet-bottom.leaflet-left{
+	width: 100%;
+}
+.leaflet-control-container .leaflet-timeline-controls{
+	box-sizing: border-box;
+	width: 100%;
+	margin: 0;
+	margin-bottom: 15px;
+}
+
 .input-wrapper {
 	margin: 0.8em 0;
 }
@@ -89,6 +99,32 @@ body {
 }
 .playpause input[type="checkbox"]:focus + label {
 	box-shadow: 0 0 5px lightblue;
+}
+
+.leaflet-control-layers-expanded {
+	background: rgba(255,255,255,0.8);
+}
+
+.time-slider::-moz-focus-outer {
+	border-style: none;
+}
+.time-slider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: #1b1b1b;
+	cursor: pointer;
+}
+.time-slider::-moz-range-thumb {
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: #1b1b1b;
+	cursor: pointer;
+	border-style: none;
+	outline: none;
 }
 
 .slider {

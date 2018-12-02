@@ -1,0 +1,11 @@
+# leaflet
+images/
+leaflet-src.esm.js
+leaflet-src.esm.js.map
+leaflet-src.js
+leaflet-src.js.map
+leaflet.css
+leaflet.js
+leaflet.js.map
+# leaflet.timelapse
+leaflet.timeline.js
