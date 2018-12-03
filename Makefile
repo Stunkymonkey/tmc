@@ -30,7 +30,7 @@ tmclog/src/tmclog: librds
 
 .PHONY: tmcimport
 tmcimport: tmcimport/src/tmcimport
-tmcimport/src/tmcimport:
+tmcimport/src/tmcimport: librds
 	$(MAKE) -C tmcimport
 
 .PHONY: tmcwebserver
