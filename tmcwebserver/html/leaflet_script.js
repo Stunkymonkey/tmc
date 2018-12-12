@@ -85,11 +85,6 @@ function createGeoJson(json) {
 	// console.log("answer: " + JSON.stringify(json));
 	events = []
 	for (var i = 0; i < json["events"].length; i++) {
-		// parse string to float, for a valid geojson
-		tmp = [];
-		for (var j = 0; j < json["events"][i]["path"].length; j++) {
-			tmp.push(json["events"][i]["path"][j].map(parseFloat));
-		}
 		// create geojson feature
 		events.push({
 			"type": "Feature",
@@ -100,7 +95,7 @@ function createGeoJson(json) {
 			},
 			"geometry": {
 				"type": "LineString",
-				"coordinates": tmp
+				"coordinates": json["events"][i]["path"]
 			}
 		});
 		// console.log(json["events"][i]["path"]);
