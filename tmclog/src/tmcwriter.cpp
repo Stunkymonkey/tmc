@@ -6,7 +6,6 @@ using namespace std;
 
 TmcWriter::TmcWriter(string filename, bool append)
 {
-	// TODO test append mode
 	std::ios_base::openmode bitmask = std::ios_base::binary;
 	if (append) {
 		bitmask |= std::ios_base::app;
