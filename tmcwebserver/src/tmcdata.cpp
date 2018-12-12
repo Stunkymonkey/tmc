@@ -69,7 +69,8 @@ void TmcData::query(std::vector<struct TmcResult*>& out, double northEastLat, do
 		return;
 	}
 
-	string sql =	"SELECT events.event, "
+	string sql =	"SELECT event_type.description, result.start, result.\"end\", result.path FROM ("
+						"SELECT events.event, "
 							"events.start, "
 							"events.\"end\", "
 							"get_path(events.lcd, events.extension, events.dir_negative) AS \"path\" "
@@ -82,7 +83,8 @@ void TmcData::query(std::vector<struct TmcResult*>& out, double northEastLat, do
 						+ to_string(northEastLat) +
 					"), points.point) "
 					"AND events.start < '" + end + " 23:59' "
-					"AND events.\"end\" >='" + start + " 0:0';";
+					"AND events.\"end\" >='" + start + " 0:0'"
+					") AS result LEFT JOIN event_type on event_type.id = result.event;";
 	// TODO use better < and add 1 to date
 	// TODO daterange?
 	// @> 	contains range 	int4range(2,4) @> int4range(2,3)
