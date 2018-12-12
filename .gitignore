@@ -33,6 +33,7 @@ mkinstalldirs
 # source files
 POINTS.DAT
 POFFSETS.DAT
+EVENTS.DAT
 points.json
 poffsets.json
 

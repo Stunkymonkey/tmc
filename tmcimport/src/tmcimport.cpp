@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 	if (false) {
 		std::string points = "./POINTS.DAT";
 		std::string poffset = "./POFFSETS.DAT";
-		std::string eventlist = "./EVENT.DAT";
+		std::string eventlist = "./EVENTS.DAT";
 		// data init database
 		TmcLCL *lclImporter = new TmcLCL(points, poffset, data);
 		TmcECL *eclImporter = new TmcECL(eventlist, data);
