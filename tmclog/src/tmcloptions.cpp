@@ -36,44 +36,48 @@ bool RdsqOptions::ProcessCmdLine(int argc, char *argv[])
 	while ( (intopt = getopt(argc,argv,"hvn:s:u:p:c:f:")) != EOF ) {
 		char option = intopt & 0xFF;
 		switch (option){
-			case 'n' :  if (try_str_to_int(optarg,itmp)) source_num=itmp;
-			else {
-				cerr << "Illegal or missing argument for option -n." << endl;
-				show_usage();
-				return false;
-			}
-			break;
-			case 's' :  if (have_opt_u){ show_usage(); return false; }
-			server_name = optarg;
-			conn_type = CONN_TYPE_TCPIP;
-			have_opt_s = true;
-			break;
-			case 'p' :  if (have_opt_u){ show_usage(); return false; }
-			if (try_str_to_int(optarg,itmp)) tcpip_port=itmp;
-			else {
-				cerr << "Illegal or missing argument for option -p." << endl;
-				show_usage();
-				return false;
-			}
-			have_opt_p = true;
-			break;
-			case 'u' :  if (have_opt_s){ show_usage(); return false; }
-			if (have_opt_p){ show_usage(); return false; }
-			server_name = optarg;
-			conn_type = CONN_TYPE_UNIX;
-			have_opt_u = true;
-			break;
+			case 'n' :
+				if (try_str_to_int(optarg,itmp)) source_num=itmp;
+				else {
+					cerr << "Illegal or missing argument for option -n." << endl;
+					show_usage();
+					return false;
+				}
+				break;
+			case 's' :
+				if (have_opt_u){ show_usage(); return false; }
+				server_name = optarg;
+				conn_type = CONN_TYPE_TCPIP;
+				have_opt_s = true;
+				break;
+			case 'p' :
+				if (have_opt_u){ show_usage(); return false; }
+				if (try_str_to_int(optarg,itmp)) tcpip_port=itmp;
+				else {
+					cerr << "Illegal or missing argument for option -p." << endl;
+					show_usage();
+					return false;
+				}
+				have_opt_p = true;
+				break;
+			case 'u' :
+				if (have_opt_s){ show_usage(); return false; }
+				if (have_opt_p){ show_usage(); return false; }
+				server_name = optarg;
+				conn_type = CONN_TYPE_UNIX;
+				have_opt_u = true;
+				break;
 			case 'c' :  have_opt_c = true;
-			break;
+				break;
 			case 'f' :  file_name = optarg;
-			have_opt_s = true;
-			break;
+				have_opt_s = true;
+				break;
 			case 'h' :  show_usage();
-			exit(0);
-			break;
+				exit(0);
+				break;
 			case 'v' :  show_version();
-			exit(0);
-			break;
+				exit(0);
+				break;
 			default  :  cerr << "Unknown option -" << option << endl;
 			show_usage();
 			return false;

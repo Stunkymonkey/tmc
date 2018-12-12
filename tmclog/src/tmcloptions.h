@@ -1,6 +1,4 @@
-#ifndef STDRDSQOPTIONS_H
-#define STDRDSQOPTIONS_H
-
+#pragma once
 #include <librds.h>
 #include <string>
 
@@ -34,5 +32,3 @@ private:
 	void show_version();
 	bool try_str_to_int(char *s, int &result);
 };
-
-#endif
