@@ -32,6 +32,7 @@
 #include "tmcjson.h"
 #include "tmcdata.h"
 #include "tmcresult.h"
+#include "tmcwoptions.h"
 
 using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 namespace http = boost::beast::http;    // from <boost/beast/http.hpp>
@@ -499,22 +500,17 @@ public:
 
 //------------------------------------------------------------------------------
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char *argv[]) {
 	// Check command line arguments.
-	if (argc != 5)
-	{
-		std::cerr <<
-		"Usage: webserver <address> <port> <doc_root> <threads>\n" <<
-		"Example:\n" <<
-		"	webserver 0.0.0.0 8080 ./html/ 1\n";
-		return EXIT_FAILURE;
-	}
-	auto const address = boost::asio::ip::make_address(argv[1]);
-	auto const port = static_cast<unsigned short>(std::atoi(argv[2]));
-	auto const doc_root = std::make_shared<std::string>(argv[3]);
-	auto const threads = std::max<int>(1, std::atoi(argv[4]));
+	RdswOptions opts;
+	if (! opts.ProcessCmdLine(argc,argv)) exit(1);
 
+	boost::asio::ip::address address = boost::asio::ip::make_address(opts.GetServerName());
+	int threads = std::max<int>(1, opts.GetThreads());
+	unsigned short port = static_cast<unsigned short>(opts.GetPort());
+	auto doc_root = std::make_shared<std::string>(opts.GetDocRoot());
+
+	// TODO have options
 	data = new TmcData("tmc", "tmc", "asdf", "127.0.0.1", "5432");
 	if (!data->checkConnection()) {
 		return 42;
