@@ -69,6 +69,9 @@ function addGeoJson(data) {
 				fillOpacity: 0.5
 				}
 			},
+		pointToLayer: function(geoJsonPoint, latlng) {
+				return L.circleMarker(latlng);
+		},
 		// waitToUpdateMap: true,
 		showTicks : true,
 		onEachFeature: function(feature, layer) {
@@ -85,20 +88,35 @@ function createGeoJson(json) {
 	// console.log("answer: " + JSON.stringify(json));
 	events = []
 	for (var i = 0; i < json["events"].length; i++) {
-		// create geojson feature
-		events.push({
-			"type": "Feature",
-			"properties": {
-				"name": json["events"][i]["event"],
-				"start": json["events"][i]["start"],
-				"end": json["events"][i]["end"]
-			},
-			"geometry": {
-				"type": "LineString",
-				"coordinates": json["events"][i]["path"]
-			}
-		});
-		// console.log(json["events"][i]["path"]);
+		// create geojson feature: line or marker
+		console.log(json["events"][i]["path"].length);
+		if (json["events"][i]["path"].length == 1) {
+			events.push({
+				"type": "Feature",
+				"properties": {
+					"name": json["events"][i]["event"],
+					"start": json["events"][i]["start"],
+					"end": json["events"][i]["end"]
+				},
+				"geometry": {
+					"type": "Point",
+					"coordinates": json["events"][i]["path"][0]
+				}
+			});
+		} else {
+			events.push({
+				"type": "Feature",
+				"properties": {
+					"name": json["events"][i]["event"],
+					"start": json["events"][i]["start"],
+					"end": json["events"][i]["end"]
+				},
+				"geometry": {
+					"type": "LineString",
+					"coordinates": json["events"][i]["path"]
+				}
+			});
+		}
 	}
 	return {"type": "FeatureCollection", "features": events};
 }
