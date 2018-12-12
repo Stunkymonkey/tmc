@@ -70,7 +70,7 @@ function addGeoJson(data) {
 				}
 			},
 		pointToLayer: function(geoJsonPoint, latlng) {
-				return L.circleMarker(latlng);
+				return L.circle(latlng);
 		},
 		// waitToUpdateMap: true,
 		showTicks : true,
