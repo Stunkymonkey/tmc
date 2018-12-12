@@ -84,7 +84,7 @@ void TmcData::query(std::vector<struct TmcResult*>& out, double northEastLat, do
 					"AND events.start < '" + end + " 23:59' "
 					"AND events.\"end\" >='" + start + " 0:0';";
 	// TODO use better < and add 1 to date
-	// TODO datenrange?
+	// TODO daterange?
 	// @> 	contains range 	int4range(2,4) @> int4range(2,3)
 
 	cout << sql << endl;
@@ -95,7 +95,7 @@ void TmcData::query(std::vector<struct TmcResult*>& out, double northEastLat, do
 	// reserve size of result
 	out.reserve(R.size());
 	for (result::const_iterator c = R.begin(); c != R.end(); ++c) {
-		TmcResult* tmp = new TmcResult();
+		TmcResult *tmp = new TmcResult();
 		// read all to TmcResult
 		tmp->event = c[0].as<std::string>();
 		tmp->start = c[1].as<std::string>();
