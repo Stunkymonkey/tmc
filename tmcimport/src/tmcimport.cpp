@@ -13,7 +13,8 @@
 #include "tmcioptions.h"
 #include "tmcqueryhandler.h"
 #include "tmcreader.h"
-#include "tmclcd.h"
+#include "tmclcl.h"
+#include "tmcecl.h"
 #include "tmcfilter.h"
 
 using namespace std;
@@ -72,13 +73,18 @@ int main(int argc, char *argv[])
 	if (false) {
 		std::string points = "./POINTS.DAT";
 		std::string poffset = "./POFFSETS.DAT";
+		std::string eventlist = "./EVENT.DAT";
 		// data init database
-		TmcLCL *lcdImporter = new TmcLCL(points, poffset, data);
-		lcdImporter->readPoints();
+		TmcLCL *lclImporter = new TmcLCL(points, poffset, data);
+		TmcECL *eclImporter = new TmcECL(eventlist, data);
+		lclImporter->readPoints();
 		cout << "Successfully imported " << points;
-		lcdImporter->readOffsets();
-		cout << " & " << poffset << endl;
-		delete lcdImporter;
+		lclImporter->readOffsets();
+		cout << " & " << poffset;
+		eclImporter->readEventTypes();
+		cout << " & " << eventlist << endl;
+		delete lclImporter;
+		delete eclImporter;
 		return 0;
 	}
 

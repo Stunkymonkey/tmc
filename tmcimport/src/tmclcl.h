@@ -5,7 +5,7 @@
 
 class TmcLCL{
 public:
-	TmcLCL(std::string points, std::string poffset, TmcData* new_data);
+	TmcLCL(std::string points, std::string poffset, TmcData *new_data);
 	~TmcLCL();
 	void readPoints();
 	void readOffsets();

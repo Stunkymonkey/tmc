@@ -2,11 +2,11 @@
 #include <vector>
 #include <boost/algorithm/string.hpp>
 
-#include "tmclcd.h"
+#include "tmclcl.h"
 
 using namespace std;
 
-TmcLCL::TmcLCL(string points, string poffset, TmcData* new_data) {
+TmcLCL::TmcLCL(string points, string poffset, TmcData *new_data) {
 	data = new_data;
 
 	file_points = std::ifstream(points);
@@ -28,6 +28,7 @@ TmcLCL::TmcLCL(string points, string poffset, TmcData* new_data) {
 
 TmcLCL::~TmcLCL() {
 	file_points.close();
+	file_poffset.close();
 }
 
 void TmcLCL::readPoints() {
