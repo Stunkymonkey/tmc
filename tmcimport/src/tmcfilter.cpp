@@ -6,7 +6,7 @@
 
 using namespace std;
 
-TmcFilter::TmcFilter(TmcData* new_data) {
+TmcFilter::TmcFilter(TmcData *new_data) {
 	data = new_data;
 }
 
@@ -58,7 +58,7 @@ void TmcFilter::addChunk(string new_string) {
 
 void TmcFilter::printEvent(time_t time, std::string line, bool isNew) {
 	// debug helper
-	struct tm * timeinfo;
+	struct tm *timeinfo;
 	char buffer[80];
 	timeinfo = localtime(&time);
 

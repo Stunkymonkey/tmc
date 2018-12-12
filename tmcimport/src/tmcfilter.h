@@ -5,7 +5,7 @@
 
 class TmcFilter {
 public:
-	TmcFilter(TmcData* new_data);
+	TmcFilter(TmcData *new_data);
 	~TmcFilter();
 	void addChunk(std::string new_string);
 private:
