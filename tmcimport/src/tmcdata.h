@@ -10,6 +10,7 @@ public:
 	// LCL based
 	void insertLcd(int id, float x, float y);
 	void insertOffset(int lcd, int neg, int pos);
+	void insertEventType(int eventcode, std::string desc);
 	// event based
 	void startSingleEvent(time_t time, int loc, int event, int ext, bool dir);
 	void endSingleEvent(time_t time, int loc, int event, int ext, bool dir);

@@ -72,6 +72,22 @@ void TmcData::insertOffset(int lcd, int neg, int pos) {
 	W.commit();
 }
 
+void TmcData::insertEventType(int eventcode, string desc) {
+	if (!C->is_open()) {
+		cout << "Database closed unexpected" << endl;
+		return;
+	}
+
+	string sql = 	"INSERT INTO event_type (id, description) " \
+					"VALUES ( " \
+					"" + to_string(eventcode) + ", " \
+					"" + desc + ");";
+
+	work W(*C);
+	W.exec( sql );
+	W.commit();
+}
+
 void TmcData::startSingleEvent(time_t time, int loc, int event, int ext, bool dir) {
 	if (!C->is_open()) {
 		cout << "Database closed unexpected" << endl;

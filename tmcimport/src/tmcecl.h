@@ -9,7 +9,7 @@ public:
 	~TmcECL();
 	void readEventTypes();
 private:
-	void addEvent(std::string new_line);
+	void addEventType(std::string new_line);
 	TmcData *data;
 	std::ifstream file_events;
 };

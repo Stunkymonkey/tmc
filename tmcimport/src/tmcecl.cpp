@@ -12,7 +12,7 @@ TmcECL::TmcECL(std::string eventTypes, TmcData *new_data) {
 	file_events = std::ifstream(eventTypes);
 
 	if(!file_events) {
-		cerr << "Cannot open " + points + " file.\n";
+		cerr << "Cannot open " + eventTypes + " file.\n";
 	}
 
 	char header[500];
@@ -24,14 +24,14 @@ TmcECL::~TmcECL() {
 }
 
 void TmcECL::readEventTypes() {
-	char line[300];
+	char line[1000];
 	while(!file_events.eof()) {
 		file_events.getline(line, sizeof(line));
 		addEventType(line);
 	}
 }
 
-void TmcLCL::addEventType(string new_line) {
+void TmcECL::addEventType(string new_line) {
 	// checking if line is empty
 	if (new_line.size() <= 0) {
 		return;
@@ -41,9 +41,9 @@ void TmcLCL::addEventType(string new_line) {
 	// this splits the line into strs by spliting at ';'
 	boost::split(strs, new_line, boost::is_any_of(";"));
 
-	// TODO richtige index...
-	return;
-	// check if eventcode is even available
-
-	data->insertEventType(stoi(strs[6]), stof(strs[3]));
+	// some lines do not have an event code. ignoring them by checking if exists
+	if (strs[6] != "") {
+		replace( strs[3].begin(), strs[3].end(), '"', '\'');
+		data->insertEventType(stoi(strs[6]), strs[3]);
+	}
 }
