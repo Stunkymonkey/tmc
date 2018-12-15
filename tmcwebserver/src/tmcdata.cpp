@@ -8,8 +8,13 @@ using namespace pqxx;
 
 TmcData::TmcData(string db_name, string user, string password, string hostaddr, string port) {
 	// TODO check parameter
-	dbConfig = "dbname = " + db_name + " user = " + user + " password = " + password + " hostaddr = " + hostaddr + " port = " + port;
-	// cout << dbConfig << endl;
+	// password not set
+	dbConfig = "dbname = " + db_name + " user = " + user;
+	if (password != "") {
+		dbConfig = dbConfig + " password = " + password;
+	}
+	dbConfig = dbConfig + " hostaddr = " + hostaddr + " port = " + port;
+	
 	try {
 		C = new pqxx::connection(dbConfig);
 		if (C->is_open()) {

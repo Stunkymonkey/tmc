@@ -15,10 +15,15 @@ namespace po = boost::program_options;
 using namespace std;
 
 RdswOptions::RdswOptions():
-	threads(1),
+	web_ip("127.0.0.1"),
 	web_port(8081),
+	threads(1),
 	doc_root("../html/"),
-	web_ip("127.0.0.1")
+	psql_host("127.0.0.1"),
+	psql_port(5432),
+	psql_user("tmc"),
+	psql_password(""),
+	psql_database("tmc")
 {
 }
 
@@ -37,7 +42,7 @@ bool RdswOptions::ProcessCmdLine(int argc, char *argv[]) {
 			("port,p", po::value<int>(), "TCP/IP port where webserver will run")
 			("doc-root,d", po::value<string>(), "document root, where the html files can be found")
 			("postgre-server,", po::value<string>(), "IP of PostgreSQL-server")
-			("postgre-port,", po::value<string>(), "Port of PostgreSQL")
+			("postgre-port,", po::value<int>(), "Port of PostgreSQL")
 			("postgre-user,", po::value<string>(), "PostgreSQL-User")
 			("postgre-password", po::value<string>(), "Password of PostgreSQL-User")
 			("postgre-database", po::value<string>(), "PostgreSQL database-name");

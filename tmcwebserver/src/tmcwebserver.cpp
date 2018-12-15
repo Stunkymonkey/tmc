@@ -510,8 +510,13 @@ int main(int argc, char *argv[]) {
 	unsigned short port = static_cast<unsigned short>(opts.GetPort());
 	auto doc_root = std::make_shared<std::string>(opts.GetDocRoot());
 
-	// TODO have options
-	data = new TmcData("tmc", "tmc", "asdf", "127.0.0.1", "5432");
+	string psql_host = opts.GetPsqlHost();
+	int psql_port = opts.GetPsqlPort();
+	string psql_user = opts.GetPsqlUser();
+	string psql_password = opts.GetPsqlPassword();
+	string psql_database = opts.GetPsqlDatabase();
+
+	data = new TmcData(psql_database, psql_user, psql_password, psql_host, std::to_string(psql_port));
 	if (!data->checkConnection()) {
 		return 42;
 	}
