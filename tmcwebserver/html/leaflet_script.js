@@ -89,7 +89,6 @@ function createGeoJson(json) {
 	events = []
 	for (var i = 0; i < json["events"].length; i++) {
 		// create geojson feature: line or marker
-		console.log(json["events"][i]["path"].length);
 		if (json["events"][i]["path"].length == 1) {
 			events.push({
 				"type": "Feature",
@@ -124,7 +123,8 @@ function createGeoJson(json) {
 function addTimeLineControl() {
 	slider = L.timelineSliderControl({
 		formatOutput: function(date) {
-			return new Date(date).toLocaleDateString();
+			var result = new Date(date);
+			return result.toLocaleDateString() + " " + result.toLocaleTimeString();
 		},
 		enableKeyboardControls: true,
 	});
