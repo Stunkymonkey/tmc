@@ -7,5 +7,6 @@ leaflet-src.js.map
 leaflet.css
 leaflet.js
 leaflet.js.map
-# leaflet.timelapse
+# leaflet-plugins
 leaflet.timeline.js
+leaflet-heat.js
