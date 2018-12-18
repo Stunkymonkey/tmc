@@ -68,6 +68,10 @@ body {
 	width: 100%;
 }
 
+.overlay {
+	background-color: #5E5E5E;
+}
+
 .speed {
 	margin-left: 10px;
 }
@@ -162,6 +166,10 @@ label{
 	display: inline-block;
 	width: 50px;
 	font-size: 0.9rem;
+}
+label-big{
+	display: inline-block;
+	width: 50px;
 }
 input[type=date] {
 	display: inline-block;
