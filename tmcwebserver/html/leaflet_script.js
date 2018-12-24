@@ -243,12 +243,12 @@ function setDateRange(json) {
 	var min = json['min'].split(" ")[0];
 	var max = json['max'].split(" ")[0];
 	console.log("min: " + min + " max: " + max);
-	document.getElementById("start-time").setAttribute('min', min);
-	document.getElementById("start-time").setAttribute('max', max);
-	document.getElementById("end-time").setAttribute('min', min);
-	document.getElementById("end-time").setAttribute('max', max);
-	document.getElementById("start-time").setAttribute('value', min);
-	document.getElementById("end-time").setAttribute('value', max);
+	document.getElementById("start-date").setAttribute('min', min);
+	document.getElementById("start-date").setAttribute('max', max);
+	document.getElementById("end-date").setAttribute('min', min);
+	document.getElementById("end-date").setAttribute('max', max);
+	document.getElementById("start-date").setAttribute('value', min);
+	document.getElementById("end-date").setAttribute('value', max);
 }
 
 dateRange();
