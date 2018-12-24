@@ -42,8 +42,10 @@ function search() {
 	};
 
 	var bounds = map.getBounds();
-	var start = document.getElementById("start-time").value;
-	var end = document.getElementById("end-time").value;
+	var start = document.getElementById("start-date").value;
+	var end = document.getElementById("end-date").value;
+	var start_time = document.getElementById("start-time").value;
+	var end_time = document.getElementById("end-time").value;
 	var body = {
 		"view": {
 			"northeast": bounds["_northEast"],
@@ -52,6 +54,10 @@ function search() {
 		"date": {
 			"start": start,
 			"end": end
+		},
+		"time": {
+			"start": start_time,
+			"end": end_time
 		}
 	};
 	var data = JSON.stringify(body);
