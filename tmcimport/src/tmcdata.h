@@ -13,9 +13,9 @@ public:
 	void insertEventType(int eventcode, std::string desc);
 	// event based
 	void startSingleEvent(time_t time, int loc, int event, int ext, bool dir);
-	void endSingleEvent(time_t time, int loc, int event, int ext, bool dir);
+	void endSingleEvent(time_t time, int loc, int ext, bool dir);
 	int startGroupEvent(time_t time, int loc, int event, int ext, bool dir);
-	void endGroupEvent(time_t time, int loc, int event, int ext, bool dir);
+	void endGroupEvent(time_t time, int loc, int ext, bool dir);
 	void addGroupEventInfo(int id, int f1, int f2);
 private:
 	std::string dbConfig = "";

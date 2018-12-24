@@ -4,6 +4,7 @@ using namespace std;
 
 TmcReader::TmcReader(string filename)
 {
+	file_name = filename;
 	boost::iostreams::file_source myCprdFile (filename, std::ios_base::in | std::ios_base::binary);
 
 	bunzip2Filter.push(boost::iostreams::bzip2_decompressor());
@@ -28,7 +29,7 @@ char TmcReader::peekChar() {
 bool TmcReader::getChunk(string &result) {
 	// check if filreader is at the end
 	if (peekChar() == EOF) {
-		cout << "file is read" << endl;
+		cout << file_name << " is read" << endl;
 		return false;
 	}
 	bool status = false;

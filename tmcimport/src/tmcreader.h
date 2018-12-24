@@ -11,5 +11,6 @@ public:
 private:
 	boost::iostreams::filtering_istream bunzip2Filter;
 	bool read(std::string &s);
+	std::string file_name;
 	char peekChar();
 };

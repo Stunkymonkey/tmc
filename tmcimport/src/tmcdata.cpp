@@ -98,7 +98,7 @@ void TmcData::startSingleEvent(time_t time, int loc, int event, int ext, bool di
 		return;
 	}
 
-	string sql = 	"INSERT INTO events (\"start\", \"end\", lcd, event, extension, dir_positive) " \
+	string sql = 	"INSERT INTO events (\"start\", \"end\", lcd, event, extension, dir_negative) " \
 					"VALUES ( " \
 					"to_timestamp(" + to_string(time) + "), " \
 					"NULL, " \
@@ -112,7 +112,7 @@ void TmcData::startSingleEvent(time_t time, int loc, int event, int ext, bool di
 	W.commit();
 }
 
-void TmcData::endSingleEvent(time_t time, int loc, int event, int ext, bool dir) {
+void TmcData::endSingleEvent(time_t time, int loc, int ext, bool dir) {
 	if (!C->is_open()) {
 		cout << "Database closed unexpected" << endl;
 		return;
@@ -122,7 +122,7 @@ void TmcData::endSingleEvent(time_t time, int loc, int event, int ext, bool dir)
 					"SET \"end\" = to_timestamp(" + to_string(time) + ") " \
 					"WHERE (lcd = " + to_string(loc) + ") AND (\"end\" IS NULL) " \
 					"AND (extension = " + to_string(ext) + ") " \
-					"AND (dir_positive = " + to_string(dir) + "::BOOLEAN);";
+					"AND (dir_negative = " + to_string(dir) + "::BOOLEAN);";
 
 	work W(*C);
 	W.exec( sql );
@@ -136,7 +136,7 @@ int TmcData::startGroupEvent(time_t time, int loc, int event, int ext, bool dir)
 		return 0;
 	}
 
-	string sql = 	"INSERT INTO events (\"start\", \"end\", lcd, event, extension, dir_positive) " \
+	string sql = 	"INSERT INTO events (\"start\", \"end\", lcd, event, extension, dir_negative) " \
 					"VALUES ( " \
 					"to_timestamp(" + to_string(time) + "), " \
 					"NULL, " \
@@ -156,7 +156,7 @@ int TmcData::startGroupEvent(time_t time, int loc, int event, int ext, bool dir)
 	return id;
 }
 
-void TmcData::endGroupEvent(time_t time, int loc, int event, int ext, bool dir) {
+void TmcData::endGroupEvent(time_t time, int loc, int ext, bool dir) {
 	if (!C->is_open()) {
 		cout << "Database closed unexpected" << endl;
 		return;
@@ -164,7 +164,9 @@ void TmcData::endGroupEvent(time_t time, int loc, int event, int ext, bool dir) 
 
 	string sql = 	"UPDATE events " \
 					"SET \"end\" = to_timestamp(" + to_string(time) + ") " \
-					"WHERE (lcd = " + to_string(loc) + ") AND (\"end\" IS NULL);";
+					"WHERE (lcd = " + to_string(loc) + ") AND (\"end\" IS NULL) " \
+					"AND (extension = " + to_string(ext) + ") " \
+					"AND (dir_negative = " + to_string(dir) + "::BOOLEAN);";
 
 	work W(*C);
 	W.exec( sql );

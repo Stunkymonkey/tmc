@@ -6,6 +6,11 @@
 
 using namespace std;
 
+// these values are hardcoded when event type defines end
+set<int> cancel_set = {128, 1589, 334, 2028, 625, 672, 673, 399, 468,
+	2029, 801, 971, 2030, 1025, 1127, 1314, 1214, 1585, 2033, 1620, 2034,
+	2035, 1703, 1763, 1837, 1857, 1883, 2038,1911, 2039, 2040};
+
 TmcFilter::TmcFilter(TmcData *new_data) {
 	data = new_data;
 }
@@ -33,12 +38,13 @@ void TmcFilter::addChunk(string new_string) {
 		rawtime = mktime(&tm);
 	} else {
 		// TODO test
-		time (&rawtime);
+		time(&rawtime);
 	}
 
 	vector<string>::iterator it = old_strings.begin();
 
 	while (it != old_strings.end()) {
+		// check if strings are equal
 		if (*it == *tok_iter){
 			tok_iter++;
 			it++;
@@ -48,7 +54,8 @@ void TmcFilter::addChunk(string new_string) {
 			old_strings.erase(it);
 		}
 	}
-	while (tok_iter != tokens.end()) {
+	// if tok_iter is end all old_strings have to be ended
+	while (tok_iter != tokens.end() && *tok_iter != "end") {
 		// new lines
 		old_strings.push_back(*tok_iter);
 		processLine(rawtime, *tok_iter, true);
@@ -91,11 +98,20 @@ void TmcFilter::processLine(time_t time, std::string line, bool isNew) {
 		int loc = stoi(strs[4]);
 		int ext = stoi(strs[6]);
 		bool dir = stoi(strs[10]);
-		if (isNew) {
-			data->startSingleEvent(time, loc, event, ext, dir);
+		if (!(cancel_set.find(event) != cancel_set.end())) {
+			// event type is not canceling
+			if (isNew) {
+				data->startSingleEvent(time, loc, event, ext, dir);
+			} else {
+				data->endSingleEvent(time, loc, ext, dir);
+			}
 		} else {
-			data->endSingleEvent(time, loc, event, ext, dir);
+			// event type is canceling
+			if (isNew) {
+				data->endSingleEvent(time, loc, ext, dir);
+			}
 		}
+		
 	} else if ((strs.size() == 11) && ((strs[0].compare("GF")) == 0)) {
 		// initial group event
 		int event = stoi(strs[2]);
@@ -103,10 +119,17 @@ void TmcFilter::processLine(time_t time, std::string line, bool isNew) {
 		int ext = stoi(strs[6]);
 		int ci = stoi(strs[8]);
 		bool dir = stoi(strs[10]);
-		if (isNew) {
-			ci_index[ci - 1] = data->startGroupEvent(time, loc, event, ext, dir);
+		if (!(cancel_set.find(event) != cancel_set.end())) {
+			// event type is not canceling
+			if (isNew) {
+				ci_index[ci - 1] = data->startGroupEvent(time, loc, event, ext, dir);
+			} else {
+				data->endGroupEvent(time, loc, ext, dir);
+			}
 		} else {
-			data->endGroupEvent(time, loc, event, ext, dir);
+			if (isNew) {
+				data->endGroupEvent(time, loc, ext, dir);
+			}
 		}
 	} else if ((strs.size() == 9) && ((strs[0].compare("GS")) == 0)) {
 		// following group events
