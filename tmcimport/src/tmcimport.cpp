@@ -95,11 +95,18 @@ int main(int argc, char *argv[])
 	string chunk = "";
 	int i = 0;
 	while (reader->getChunk(chunk)) {
-		std::cout << i << std::endl;
+		std::cout << "chunk: " << i << "\r";
 		i ++;
 		manager->addChunk(chunk);
 	}
 	delete reader;
+
+	// if there are events unfinished, this will end them.
+	std::istringstream last_chunk(chunk);
+	std::string last_timestamp;
+	std::getline(last_chunk, last_timestamp);
+	last_timestamp += "\nend";
+	manager->addChunk(last_timestamp);
 
 	// remove for live
 	// TODO fix mem-leak in manager
