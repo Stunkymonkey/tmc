@@ -30,14 +30,24 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
 
 //request
 function search() {
+	var x = document.getElementById("not-found");
+	x.style.display = "none";
+	markerGroup.clearLayers();
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", url + "query", true);
 	xhr.setRequestHeader("Content-type", "application/json");
 	xhr.onreadystatechange = function () {
 		if (xhr.readyState === 4 && xhr.status === 200) {
 			var json = JSON.parse(xhr.responseText);
-			data = createGeoJson(json);
-			addGeoJson(data);
+			if (json.events != "") {
+				addJson(json);
+			} else {
+				// no events
+				var x = document.getElementById("not-found");
+				if (x.style.display === "none") {
+					x.style.display = "block";
+				}
+			}
 		}
 	};
 
@@ -197,18 +207,11 @@ function DrawOverlayLines(json) {
 	overlay_points();
 }
 
-function DrawOverlayPoints(json) {
-	if (!isOverlayPointsDrawn) {
-		isOverlayPointsDrawn = true;
-		for (var i = 0; i < json.length; i++) {
-			L.circle(json[i][1], {
-				radius: 50,
-				weight: 0.2,
-				color: "#f0027f"
-			}).addTo(map).bindPopup("" + json[i][0]);
-		}
+function hideNotFound() {
+	var x = document.getElementById("not-found");
+	if (x.style.display === "block") {
+		x.style.display = "none";
 	}
-	console.log("done painting points");
 }
 
 function dateRange() {
