@@ -131,7 +131,7 @@ body {
 	outline: none;
 }
 
-#not-found {
+.toast {
   min-width: 250px;
   margin-left: -125px;
   background-color: #333;

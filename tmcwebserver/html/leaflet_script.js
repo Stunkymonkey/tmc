@@ -30,8 +30,8 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
 
 //request
 function search() {
-	var x = document.getElementById("not-found");
-	x.style.display = "none";
+	document.getElementById("not-found").style.display = "none";
+	document.getElementById("server-down").style.display = "none";
 	markerGroup.clearLayers();
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", url + "query", true);
@@ -48,6 +48,8 @@ function search() {
 					x.style.display = "block";
 				}
 			}
+		} else if (xhr.readyState === 4) {
+			document.getElementById("server-down").style.display = "block";
 		}
 	};
 
@@ -188,6 +190,8 @@ function overlay_points() {
 		if (xhr_p.readyState === 4 && xhr_p.status === 200) {
 			var json = JSON.parse(xhr_p.responseText);
 			DrawOverlayPoints(json);
+		} else if (xhr.readyState === 4) {
+			document.getElementById("server-down").style.display = "block";
 		}
 	};
 	xhr_p.send();
@@ -214,6 +218,13 @@ function hideNotFound() {
 	}
 }
 
+function hideServerDown() {
+	var x = document.getElementById("server-down");
+	if (x.style.display === "block") {
+		x.style.display = "none";
+	}
+}
+
 function dateRange() {
 	var xhr_p = new XMLHttpRequest();
 	xhr_p.open("GET", url + "date-range", true);
@@ -222,11 +233,12 @@ function dateRange() {
 		if (xhr_p.readyState === 4 && xhr_p.status === 200) {
 			var json = JSON.parse(xhr_p.responseText);
 			setDateRange(json);
+		} else if (xhr.readyState === 4) {
+			document.getElementById("server-down").style.display = "block";
 		}
 	};
 	xhr_p.send();
 }
-
 function setDateRange(json) {
 	var min = json['min'].split(" ")[0];
 	var max = json['max'].split(" ")[0];
