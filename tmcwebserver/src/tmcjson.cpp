@@ -21,7 +21,7 @@ std::string TmcJson::min_max_date(std::string *min, std::string *max) {
 	return oss.str();
 }
 
-bool TmcJson::tmc_request(string body, double& northEastLat, double& northEastLng, double& southWestLat, double& southWestLng, string& start, string& end) {
+bool TmcJson::tmc_request(string body, double& northEastLat, double& northEastLng, double& southWestLat, double& southWestLng, string& start_date, string& end_date, string& start_time, string& end_time) {
 	std::stringstream ss;
 	pt::ptree root;
 	ss << body;
@@ -31,13 +31,14 @@ bool TmcJson::tmc_request(string body, double& northEastLat, double& northEastLn
 		northEastLng = root.get<double>("view.northeast.lng");
 		southWestLat = root.get<double>("view.southwest.lat");
 		southWestLng = root.get<double>("view.southwest.lng");
-		start =  root.get<string>("date.start");
-		end =  root.get<string>("date.end");
+		start_date =  root.get<string>("date.start");
+		end_date =  root.get<string>("date.end");
+		start_time =  root.get<string>("time.start");
+		end_time =  root.get<string>("time.end");
 	} catch (const boost::property_tree::ptree_bad_path& e) {
 		return false;
 	} catch (...) {
-		// TODO fix
-		cout << "unknown error" << endl;
+		cout << "unknown error while parsing json-request" << endl;
 	}
 	return true;
 }

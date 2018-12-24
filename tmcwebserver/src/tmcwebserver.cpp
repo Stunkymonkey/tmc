@@ -188,16 +188,18 @@ handle_request(
 		double northEastLng;
 		double southWestLat;
 		double southWestLng;
-		std::string start;
-		std::string end;
-		bool valid_json = TmcJson::tmc_request(req.body(), northEastLat, northEastLng, southWestLat, southWestLng, start, end);
+		std::string start_date;
+		std::string end_date;
+		std::string start_time;
+		std::string end_time;
+		bool valid_json = TmcJson::tmc_request(req.body(), northEastLat, northEastLng, southWestLat, southWestLng, start_date, end_date, start_time, end_time);
 		if (!valid_json) {
 			// TODO if not valid json return error
 			// return
 		}
 
 		std::vector<struct TmcResult*> out;
-		data->query(out, northEastLat, northEastLng, southWestLat, southWestLng, start, end);
+		data->query(out, northEastLat, northEastLng, southWestLat, southWestLng, start_date, end_date, start_time, end_time);
 		std::string finalString = TmcJson::tmc_query(out);
 
 		std::cout << TmcJson::tmc_query(out) << std::endl;
@@ -529,6 +531,8 @@ int main(int argc, char *argv[]) {
 		ioc,
 		tcp::endpoint{address, port},
 		doc_root)->run();
+
+	std::cout << "Webserver running on http://" << address << ":" << port << std::endl;
 
 	// Run the I/O service on the requested number of threads
 	std::vector<std::thread> v;

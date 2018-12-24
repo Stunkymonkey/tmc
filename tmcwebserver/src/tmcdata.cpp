@@ -67,7 +67,7 @@ tuple<std::string, std::string> TmcData::minMaxDate() {
 	return make_tuple(min, max);
 }
 
-void TmcData::query(std::vector<struct TmcResult*>& out, double northEastLat, double  northEastLng, double southWestLat, double southWestLng, string start, string end) {
+void TmcData::query(std::vector<struct TmcResult*>& out, double northEastLat, double  northEastLng, double southWestLat, double southWestLng, string start_date, string end_date, string start_time, string end_time) {
 	// return id of event, because it is needed for additional group infos
 	if (!C->is_open()) {
 		cout << "Database closed unexpected" << endl;
@@ -87,8 +87,8 @@ void TmcData::query(std::vector<struct TmcResult*>& out, double northEastLat, do
 						+ to_string(northEastLng) + ", "
 						+ to_string(northEastLat) +
 					"), points.point) "
-					"AND events.start < '" + end + " 23:59' "
-					"AND events.\"end\" >='" + start + " 0:0'"
+					"AND events.start < '" + end_date + " 23:59' "
+					"AND events.\"end\" >='" + start_date + " 0:0'"
 					") AS result LEFT JOIN event_type on event_type.id = result.event;";
 	// TODO use better < and add 1 to date
 	// TODO daterange?
