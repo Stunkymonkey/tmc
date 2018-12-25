@@ -7,6 +7,7 @@ public:
 	TmcData(std::string db_name, std::string user, std::string password, std::string hostaddr, std::string port);
 	~TmcData();
 	bool checkConnection();
+	void initDatabase();
 	// LCL based
 	void insertLcd(int id, float x, float y);
 	void insertOffset(int lcd, int neg, int pos);

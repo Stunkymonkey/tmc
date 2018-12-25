@@ -44,6 +44,59 @@ bool TmcData::checkConnection() {
 	}
 }
 
+void TmcData::initDatabase() {
+	if (!C->is_open()) {
+		cout << "Database closed unexpected" << endl;
+		return;
+	}
+
+	string points = 	"CREATE TABLE points (" \
+							"id SERIAL UNIQUE PRIMARY KEY," \
+							"point GEOMETRY" \
+						");";
+	string points_index = "CREATE INDEX areas_points ON points USING GIST (point);";
+
+	string events = 	"CREATE TABLE events (" \
+							"id bigserial UNIQUE PRIMARY KEY," \
+							"\"start\" TIMESTAMP," \
+							"\"end\" TIMESTAMP, CHECK (\"start\" <= \"end\")," \
+							"lcd SERIAL," \
+							"event SERIAL," \
+							"extension SERIAL," \
+							"dir_negative BOOLEAN" \
+						");";
+	string time_index = "CREATE INDEX time_index ON events (start, \"end\");";
+	string events_info = 	"CREATE TABLE events_info (" \
+								"id bigserial," \
+								"F1 SERIAL," \
+								"F2 SERIAL" \
+							");";
+
+	string poffset = 	"CREATE TABLE point_offset (" \
+							"lcd SERIAL UNIQUE PRIMARY KEY," \
+							"positive SERIAL," \
+							"negative SERIAL," \
+							"positive_path GEOMETRY," \
+							"negative_path GEOMETRY" \
+						");";
+
+	string event_type = "CREATE TABLE event_type (" \
+							"id SERIAL UNIQUE PRIMARY KEY ," \
+							"description VARCHAR(200)" \
+						");";
+
+	work W(*C);
+	W.exec( points );
+	W.exec( points_index );
+	W.exec( events );
+	W.exec( time_index );
+	W.exec( events_info );
+	W.exec( poffset );
+	W.exec( event_type );
+	W.commit();
+	cout << "successfully created databases" << endl;
+}
+
 void TmcData::insertLcd(int id, float x, float y) {
 	if (!C->is_open()) {
 		cout << "Database closed unexpected" << endl;
