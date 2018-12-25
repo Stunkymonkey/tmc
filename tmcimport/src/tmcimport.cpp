@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 	string chunk = "";
 	int i = 0;
 	while (reader->getChunk(chunk)) {
-		std::cout << "chunk: " << i << "\r";
+		// std::cout << "processed chunks: " << i << "\r";
 		i ++;
 		manager->addChunk(chunk);
 	}
