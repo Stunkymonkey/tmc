@@ -87,10 +87,9 @@ void TmcData::query(std::vector<struct TmcResult*>& out, double northEastLat, do
 						+ to_string(northEastLng) + ", "
 						+ to_string(northEastLat) +
 					"), points.point) "
-					"AND events.start < '" + end_date + " 23:59' "
+					"AND events.start < '" + end_date + " 0:0'::TIMESTAMP + INTERVAL '1 day' "
 					"AND events.\"end\" >='" + start_date + " 0:0'"
 					") AS result LEFT JOIN event_type on event_type.id = result.event;";
-	// TODO use better < and add 1 to date
 	// TODO daterange?
 	// @> 	contains range 	int4range(2,4) @> int4range(2,3)
 
