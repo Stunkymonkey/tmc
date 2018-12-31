@@ -137,7 +137,7 @@ void TmcFilter::processLine(time_t time, std::string line, bool isNew) {
 		int f1 = stoi(strs[6]);
 		int f2 = stoi(strs[8]);
 		if (isNew) {
-			data->addGroupEventInfo(ci_index[ci - 1], f1, f2);
+			data->addGroupEventInfo(ci_index[ci - 1], ci, f1, f2);
 		}
 	} else {
 		cerr << "Invalid format" << endl;

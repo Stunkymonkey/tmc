@@ -68,6 +68,7 @@ void TmcData::initDatabase() {
 	string time_index = "CREATE INDEX time_index ON events (start, \"end\");";
 	string events_info = 	"CREATE TABLE events_info (" \
 								"id bigserial," \
+								"CI SERIAL," \
 								"F1 SERIAL," \
 								"F2 SERIAL" \
 							");";
@@ -226,7 +227,7 @@ void TmcData::endGroupEvent(time_t time, int loc, int ext, bool dir) {
 	W.commit();
 }
 
-void TmcData::addGroupEventInfo(int id, int f1, int f2) {
+void TmcData::addGroupEventInfo(int id, int ci, int f1, int f2) {
 	if (!C->is_open()) {
 		cout << "Database closed unexpected" << endl;
 		return;
@@ -235,9 +236,10 @@ void TmcData::addGroupEventInfo(int id, int f1, int f2) {
 		return;
 	}
 
-	string sql = 	"INSERT INTO events_info (id, f1, f2) " \
+	string sql = 	"INSERT INTO events_info (id, ci, f1, f2) " \
 					"VALUES ( " \
 					"" + to_string(id) + ", " \
+					"" + to_string(ci) + ", " \
 					"" + to_string(f1) + ", " \
 					"" + to_string(f2) + "); ";
 

@@ -17,7 +17,7 @@ public:
 	void endSingleEvent(time_t time, int loc, int ext, bool dir);
 	int startGroupEvent(time_t time, int loc, int event, int ext, bool dir);
 	void endGroupEvent(time_t time, int loc, int ext, bool dir);
-	void addGroupEventInfo(int id, int f1, int f2);
+	void addGroupEventInfo(int id, int ci, int f1, int f2);
 private:
 	std::string dbConfig = "";
 	pqxx::connection* C;
