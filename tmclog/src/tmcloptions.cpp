@@ -35,14 +35,14 @@ bool RdslOptions::ProcessCmdLine(int argc, char *argv[])
 	{
 		po::options_description desc{"Options"};
 		desc.add_options()
-		("help,h", "Help screen")
-		("version,v", "Show version information and exit")
-		("number,n", po::value<int>()->default_value(0), "Specify the RDS source number")
-		("server,s", po::value<string>()->default_value("127.0.0.1"), "Address/name of the machine where rdsd is running")
-		("port,p", po::value<int>()->default_value(4321), "TCP/IP port where rdsd is listening")
-		("unix-socket,u", po::value<string>()->default_value("/var/tmp/rdsd.sock"), "Socket where rdsd is listening")
-		("file,f", po::value<string>()->default_value("test.tmc"), "specify file name to read from")
-		("clean,c", "clean file before writing");
+			("help,h", "Help screen")
+			("version,v", "Show version information and exit")
+			("number,n", po::value<int>()->default_value(0), "Specify the RDS source number")
+			("server,s", po::value<string>()->default_value("127.0.0.1"), "Address/name of the machine where rdsd is running")
+			("port,p", po::value<int>()->default_value(4321), "TCP/IP port where rdsd is listening")
+			("unix-socket,u", po::value<string>()->default_value("/var/tmp/rdsd.sock"), "Socket where rdsd is listening")
+			("file,f", po::value<string>()->default_value("test.tmc"), "specify file name to read from")
+			("clean,c", "clean file before writing");
 
 		po::variables_map vm;
 		po::store(po::parse_command_line(argc, argv, desc), vm);

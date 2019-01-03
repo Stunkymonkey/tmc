@@ -40,19 +40,19 @@ bool RdsqOptions::ProcessCmdLine(int argc, char *argv[])
 	{
 		po::options_description desc{"Options"};
 		desc.add_options()
-		("help,h", "Help screen")
-		("version,v", "Show version information and exit")
-		("number,n", po::value<int>()->default_value(0), "Specify the RDS source number")
-		("server,s", po::value<string>()->default_value("127.0.0.1"), "Address/name of the machine where rdsd is running")
-		("port,p", po::value<int>()->default_value(4321), "TCP/IP port where rdsd is listening")
-		("unix-socket,u", po::value<string>()->default_value("/var/tmp/rdsd.sock"), "Socket where rdsd is listening")
-		("file,f", po::value<string>()->default_value("test.tmc"), "specify file name to read from")
-		("initialize,i", "for initializing the databases")
-		("postgre-server,S", po::value<string>()->default_value("127.0.0.1"), "IP of PostgreSQL-server")
-		("postgre-port,P", po::value<int>()->default_value(5432), "Port of PostgreSQL")
-		("postgre-database,D", po::value<string>()->default_value("tmc"), "PostgreSQL database-name")
-		("postgre-user,U", po::value<string>()->default_value("tmc"), "PostgreSQL-User")
-		("postgre-password,K", po::value<string>()->default_value(""), "Password of PostgreSQL-User");
+			("help,h", "Help screen")
+			("version,v", "Show version information and exit")
+			("number,n", po::value<int>()->default_value(0), "Specify the RDS source number")
+			("server,s", po::value<string>()->default_value("127.0.0.1"), "Address/name of the machine where rdsd is running")
+			("port,p", po::value<int>()->default_value(4321), "TCP/IP port where rdsd is listening")
+			("unix-socket,u", po::value<string>()->default_value("/var/tmp/rdsd.sock"), "Socket where rdsd is listening")
+			("file,f", po::value<string>()->default_value("test.tmc"), "specify file name to read from")
+			("initialize,i", "for initializing the databases")
+			("postgre-server,S", po::value<string>()->default_value("127.0.0.1"), "IP of PostgreSQL-server")
+			("postgre-port,P", po::value<int>()->default_value(5432), "Port of PostgreSQL")
+			("postgre-database,D", po::value<string>()->default_value("tmc"), "PostgreSQL database-name")
+			("postgre-user,U", po::value<string>()->default_value("tmc"), "PostgreSQL-User")
+			("postgre-password,K", po::value<string>()->default_value(""), "Password of PostgreSQL-User");
 
 		po::variables_map vm;
 		po::store(po::parse_command_line(argc, argv, desc), vm);
