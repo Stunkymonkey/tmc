@@ -151,15 +151,22 @@ void TmcData::startSingleEvent(time_t time, int loc, int event, int ext, bool di
 		cout << "Database closed unexpected" << endl;
 		return;
 	}
-
-	string sql = 	"INSERT INTO events (\"start\", \"end\", lcd, event, extension, dir_negative) " \
-					"VALUES ( " \
+	string insert =	"INSERT INTO events (\"start\", \"end\", lcd, event, extension, dir_negative) " \
+					"SELECT " \
 					"to_timestamp(" + to_string(time) + "), " \
 					"NULL, " \
 					"" + to_string(loc) + ", " \
 					"" + to_string(event) + ", " \
 					"" + to_string(ext) + ", " \
-					"" + to_string(dir) + "::BOOLEAN); ";
+					"" + to_string(dir) + "::BOOLEAN";
+	string update = "UPDATE events " \
+					"SET \"end\"=NULL " \
+					"WHERE " \
+					"lcd=" + to_string(loc) + " AND " \
+					"event=" + to_string(event) + " AND " \
+					"extension=" + to_string(ext) + " AND " \
+					"dir_negative=" + to_string(dir);
+	string sql = "WITH upsert AS (" + update + " RETURNING *) " + insert + " WHERE NOT EXISTS (SELECT * FROM upsert);";
 
 	work W(*C);
 	W.exec( sql );
@@ -190,18 +197,27 @@ int TmcData::startGroupEvent(time_t time, int loc, int event, int ext, bool dir)
 		return 0;
 	}
 
-	string sql = 	"INSERT INTO events (\"start\", \"end\", lcd, event, extension, dir_negative) " \
-					"VALUES ( " \
+	string insert =	"INSERT INTO events (\"start\", \"end\", lcd, event, extension, dir_negative) " \
+					"SELECT " \
 					"to_timestamp(" + to_string(time) + "), " \
 					"NULL, " \
 					"" + to_string(loc) + ", " \
 					"" + to_string(event) + ", " \
 					"" + to_string(ext) + ", " \
-					"" + to_string(dir) + "::BOOLEAN ) " \
-					"RETURNING id;";
+					"" + to_string(dir) + "::BOOLEAN ";
+	string update = "UPDATE events " \
+					"SET \"end\"=NULL " \
+					"WHERE " \
+					"lcd=" + to_string(loc) + " AND " \
+					"event=" + to_string(event) + " AND " \
+					"extension=" + to_string(ext) + " AND " \
+					"dir_negative=" + to_string(dir);
+	string sql = "WITH upsert AS (" + update + " RETURNING *) " + insert + " WHERE NOT EXISTS (SELECT * FROM upsert);";
 
 	nontransaction N(*C);
 	result R( N.exec( sql ));
+
+	// TODO return id with " RETURNING id"
 
 	int id;
 	for (result::const_iterator c = R.begin(); c != R.end(); ++c) {
