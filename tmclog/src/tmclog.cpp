@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 	signal(SIGTERM,sig_proc);
 	signal(SIGQUIT,sig_proc);
 
-	RdsqOptions opts;
+	RdslOptions opts;
 	if (! opts.ProcessCmdLine(argc,argv)) exit(1);
 
 	RdsQueryHandler rds;

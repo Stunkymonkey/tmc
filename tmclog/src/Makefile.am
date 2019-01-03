@@ -7,5 +7,5 @@ AM_CPPFLAGS = $(all_includes)
 # the library search path.
 tmclog_LDFLAGS = $(all_libraries)
 
-tmclog_LDADD = -lrds -lboost_iostreams -L../../rds/librds/src/.libs/
+tmclog_LDADD = -lrds -lboost_iostreams -lboost_program_options -L../../rds/librds/src/.libs/
 noinst_HEADERS = tmcqueryhandler.h tmcloptions.h tmcwriter.h

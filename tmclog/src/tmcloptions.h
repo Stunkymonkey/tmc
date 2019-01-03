@@ -4,31 +4,25 @@
 
 using namespace std;
 
-class RdsqOptions{
+class RdslOptions{
 public:
-	RdsqOptions();
-	~RdsqOptions();
+	RdslOptions();
+	~RdslOptions();
 	bool ProcessCmdLine(int argc, char *argv[]);
-	void ShowOptions();
 	int GetConnectionType() { return conn_type; }
 	const string& GetServerName() { return server_name; }
 	int GetPort() { return tcpip_port; }
 	int GetSourceNum() { return source_num; }
 	rds_events_t GetEventMask() { return event_mask; }
-	bool IsAppendMode() {return !have_opt_c; }
 	const string& GetFileName() { return file_name; }
+	bool IsAppendMode() {return append_mode; }
 private:
 	int conn_type;
 	string server_name;
 	int tcpip_port;
 	int source_num;
 	rds_events_t event_mask;
-	bool have_opt_s;
-	bool have_opt_p;
-	bool have_opt_u;
-	bool have_opt_c;
 	string file_name;
-	void show_usage();
+	bool append_mode;
 	void show_version();
-	bool try_str_to_int(char *s, int &result);
 };
