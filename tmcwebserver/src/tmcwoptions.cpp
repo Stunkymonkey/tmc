@@ -21,9 +21,9 @@ RdswOptions::RdswOptions():
 	doc_root("../html/"),
 	psql_host("127.0.0.1"),
 	psql_port(5432),
+	psql_database("tmc"),
 	psql_user("tmc"),
-	psql_password(""),
-	psql_database("tmc")
+	psql_password("")
 {
 }
 
@@ -41,11 +41,11 @@ bool RdswOptions::ProcessCmdLine(int argc, char *argv[]) {
 			("threads,t", po::value<int>(), "amount of threads")
 			("port,p", po::value<int>(), "TCP/IP port where webserver will run")
 			("doc-root,d", po::value<string>(), "document root, where the html files can be found")
-			("postgre-server,", po::value<string>(), "IP of PostgreSQL-server")
-			("postgre-port,", po::value<int>(), "Port of PostgreSQL")
-			("postgre-user,", po::value<string>(), "PostgreSQL-User")
-			("postgre-password", po::value<string>(), "Password of PostgreSQL-User")
-			("postgre-database", po::value<string>(), "PostgreSQL database-name");
+			("postgre-server,S", po::value<string>()->default_value("127.0.0.1"), "IP of PostgreSQL-server")
+			("postgre-port,P", po::value<int>()->default_value(5432), "Port of PostgreSQL")
+			("postgre-database,D", po::value<string>()->default_value("tmc"), "PostgreSQL database-name")
+			("postgre-user,U", po::value<string>()->default_value("tmc"), "PostgreSQL-User")
+			("postgre-password,K", po::value<string>()->default_value(""), "Password of PostgreSQL-User");
 
 		po::variables_map vm;
 		po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -59,6 +59,7 @@ bool RdswOptions::ProcessCmdLine(int argc, char *argv[]) {
 			show_version();
 			exit(0);
 		}
+
 		if (vm.count("server")) {
 			web_ip = vm["server"].as<string>();
 		}
@@ -70,6 +71,22 @@ bool RdswOptions::ProcessCmdLine(int argc, char *argv[]) {
 		}
 		if (vm.count("doc-root")) {
 			doc_root = vm["doc-root"].as<string>();
+		}
+
+		if (vm.count("postgre-server")) {
+			psql_host = vm["postgre-server"].as<string>();
+		}
+		if (vm.count("postgre-port")) {
+			psql_port = vm["postgre-port"].as<int>();
+		}
+		if (vm.count("postgre-database")) {
+			psql_database = vm["postgre-database"].as<string>();
+		}
+		if (vm.count("postgre-user")) {
+			psql_user = vm["postgre-user"].as<string>();
+		}
+		if (vm.count("postgre-password")) {
+			psql_password = vm["postgre-password"].as<string>();
 		}
 	} catch (const po::error &ex) {
 		cerr << ex.what() << endl;
