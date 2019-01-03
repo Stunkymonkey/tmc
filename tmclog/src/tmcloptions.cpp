@@ -20,7 +20,7 @@ RdslOptions::RdslOptions():
 	tcpip_port(4321),
 	source_num(0),
 	event_mask(RDS_EVENT_TMC),
-	file_name("test.tmc"),
+	file_name(""),
 	append_mode(true)
 {
 }
@@ -38,17 +38,17 @@ bool RdslOptions::ProcessCmdLine(int argc, char *argv[])
 			("help,h", "Help screen")
 			("version,v", "Show version information and exit")
 			("number,n", po::value<int>()->default_value(0), "Specify the RDS source number")
-			("server,s", po::value<string>()->default_value("127.0.0.1"), "Address/name of the machine where rdsd is running")
-			("port,p", po::value<int>()->default_value(4321), "TCP/IP port where rdsd is listening")
-			("unix-socket,u", po::value<string>()->default_value("/var/tmp/rdsd.sock"), "Socket where rdsd is listening")
-			("file,f", po::value<string>()->default_value("test.tmc"), "specify file name to read from")
+			("server,s", po::value<string>(), "Address/name of the machine where rdsd is running")
+			("port,p", po::value<int>(), "TCP/IP port where rdsd is listening")
+			("unix-socket,u", po::value<string>(), "Socket where rdsd is listening")
+			("filename,f", po::value<string>(), "specify file name to read from")
 			("clean,c", "clean file before writing");
 
 		po::variables_map vm;
 		po::store(po::parse_command_line(argc, argv, desc), vm);
 		po::notify(vm);
 
-		if (vm.count("help") || (vm.count("unix-socket") || vm.count("server") || vm.count("port"))) {
+		if (vm.count("help") || (vm.count("unix-socket") && (vm.count("server") || vm.count("port")))) {
 			std::cout << desc << '\n';
 			exit(0);
 		}
@@ -74,6 +74,9 @@ bool RdslOptions::ProcessCmdLine(int argc, char *argv[])
 
 		if (vm.count("filename")) {
 			file_name = vm["filename"].as<string>();
+		} else {
+			cerr << "no file-path given" << endl;
+			exit(0);
 		}
 		append_mode = !vm.count("clean");
 
