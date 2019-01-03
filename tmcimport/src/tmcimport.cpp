@@ -64,13 +64,19 @@ int main(int argc, char *argv[])
 	RdsqOptions opts;
 	if (! opts.ProcessCmdLine(argc, argv)) exit(1);
 
-	// TODO TmcData *data = new TmcData(opts.GetDatabase());
-	TmcData *data = new TmcData("tmc", "tmc", "asdf", "127.0.0.1", "5432");
+
+	string psql_host = opts.GetPsqlHost();
+	int psql_port = opts.GetPsqlPort();
+	string psql_user = opts.GetPsqlUser();
+	string psql_password = opts.GetPsqlPassword();
+	string psql_database = opts.GetPsqlDatabase();
+
+	TmcData *data = new TmcData(psql_database, psql_user, psql_password, psql_host, std::to_string(psql_port));
 	if (!data->checkConnection()) {
 		return 42;
 	}
-	// TODO manage via opts
-	if (false) {
+
+	if (opts.GetInitState()) {
 		std::string points = "./POINTS.DAT";
 		std::string poffset = "./POFFSETS.DAT";
 		std::string eventlist = "./EVENTS.DAT";

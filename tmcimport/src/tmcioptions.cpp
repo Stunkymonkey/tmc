@@ -2,23 +2,31 @@
 #include <config.h>
 #endif
 
-#include "tmcioptions.h"
+#include <boost/program_options.hpp>
 #include <unistd.h>
 #include <iostream>
 #include <cstdlib>
 #include <sstream>
 #include <cstdio>
 
+#include "tmcioptions.h"
 
+namespace po = boost::program_options;
 using namespace std;
 
-RdsqOptions::RdsqOptions()
-	: conn_type(CONN_TYPE_UNIX),
-	server_name("/var/tmp/rdsd.sock"),
-	tcpip_port(4321), source_num(0),
-	event_mask(RDS_EVENT_TMC), have_opt_s(false),
-	have_opt_p(false), have_opt_u(false),
-	file_name("example.txt")
+RdsqOptions::RdsqOptions():
+conn_type(CONN_TYPE_UNIX),
+server_name("/var/tmp/rdsd.sock"),
+tcpip_port(4321),
+source_num(0),
+event_mask(RDS_EVENT_TMC),
+file_name("test.tmc"),
+init(false),
+psql_host("127.0.0.1"),
+psql_port(5432),
+psql_database("tmc"),
+psql_user("tmc"),
+psql_password("")
 {
 }
 
@@ -28,98 +36,83 @@ RdsqOptions::~RdsqOptions()
 
 bool RdsqOptions::ProcessCmdLine(int argc, char *argv[])
 {
-	int intopt;
-	int itmp;
-	rds_events_t evnt_tmp;
+	try
+	{
+		po::options_description desc{"Options"};
+		desc.add_options()
+		("help,h", "Help screen")
+		("version,v", "Show version information and exit")
+		("number,n", po::value<int>()->default_value(0), "Specify the RDS source number")
+		("server,s", po::value<string>()->default_value("127.0.0.1"), "Address/name of the machine where rdsd is running")
+		("port,p", po::value<int>()->default_value(4321), "TCP/IP port where rdsd is listening")
+		("unix-socket,u", po::value<string>()->default_value("/var/tmp/rdsd.sock"), "Socket where rdsd is listening")
+		("file,f", po::value<string>()->default_value("test.tmc"), "specify file name to read from")
+		("initialize,i", "for initializing the databases")
+		("postgre-server,", po::value<string>()->default_value("127.0.0.1"), "IP of PostgreSQL-server")
+		("postgre-port,", po::value<int>()->default_value(5432), "Port of PostgreSQL")
+		("postgre-database", po::value<string>()->default_value("tmc"), "PostgreSQL database-name")
+		("postgre-user,", po::value<string>()->default_value("tmc"), "PostgreSQL-User")
+		("postgre-password", po::value<string>()->default_value(""), "Password of PostgreSQL-User");
 
-	while ( (intopt = getopt(argc,argv,"hvn:s:u:p:c:f:")) != EOF ) {
-		char option = intopt & 0xFF;
-		switch (option){
-			case 'n' :  if (try_str_to_int(optarg,itmp)) source_num=itmp;
-			else {
-				cerr << "Illegal or missing argument for option -n." << endl;
-				show_usage();
-				return false;
-			}
-			break;
-			case 's' :  if (have_opt_u){ show_usage(); return false; }
-			server_name = optarg;
+		po::variables_map vm;
+		po::store(po::parse_command_line(argc, argv, desc), vm);
+		po::notify(vm);
+
+		if (vm.count("help") || (vm.count("unix-socket") || vm.count("server") || vm.count("port"))) {
+			std::cout << desc << '\n';
+			exit(0);
+		}
+		else if (vm.count("version")) {
+			show_version();
+			exit(0);
+		}
+
+		if (vm.count("server")) {
+			server_name = vm["server"].as<string>();
 			conn_type = CONN_TYPE_TCPIP;
-			have_opt_s = true;
-			break;
-			case 'p' :  if (have_opt_u){ show_usage(); return false; }
-			if (try_str_to_int(optarg,itmp)) tcpip_port=itmp;
-			else {
-				cerr << "Illegal or missing argument for option -p." << endl;
-				show_usage();
-				return false;
-			}
-			have_opt_p = true;
-			break;
-			case 'u' :  if (have_opt_s){ show_usage(); return false; }
-			if (have_opt_p){ show_usage(); return false; }
+		}
+		if (vm.count("port")) {
+			tcpip_port = vm["port"].as<int>();
+		}
+		if (vm.count("unix-socket")) {
 			server_name = optarg;
 			conn_type = CONN_TYPE_UNIX;
-			have_opt_u = true;
-			break;
-			case 'f' :  file_name = optarg;
-			have_opt_s = true;
-			break;
-			case 'h' :  show_usage();
-			exit(0);
-			break;
-			case 'v' :  show_version();
-			exit(0);
-			break;
-			default  :  cerr << "Unknown option -" << option << endl;
-			show_usage();
-			return false;
 		}
+		if (vm.count("number")) {
+			source_num = vm["number"].as<int>();
+		}
+
+		if (vm.count("filename")) {
+			file_name = vm["filename"].as<string>();
+		}
+		if (vm.count("initialize")) {
+			init = true;
+		}
+
+		if (vm.count("postgre-server")) {
+			psql_host = vm["postgre-server"].as<string>();
+		}
+		if (vm.count("postgre-port")) {
+			psql_port = vm["postgre-port"].as<int>();
+		}
+		if (vm.count("postgre-database")) {
+			psql_database = vm["postgre-database"].as<string>();
+		}
+		if (vm.count("postgre-user")) {
+			psql_user = vm["postgre-user"].as<string>();
+		}
+		if (vm.count("postgre-password")) {
+			psql_password = vm["postgre-password"].as<string>();
+		}
+
+	} catch (const po::error &ex) {
+		cerr << ex.what() << endl;
+		return false;
 	}
-	if ((have_opt_p)&&(!have_opt_s)){ show_usage(); return false; }
 	return true;
-}
-
-void RdsqOptions::ShowOptions()
-{
-	cerr << "Mode: ";
-	if (conn_type == CONN_TYPE_TCPIP) cerr << "TCP/IP";
-	else if (conn_type == CONN_TYPE_UNIX) cerr << "UNIX";
-	else cerr << "???";
-	cerr << endl;
-	cerr << "Server: " << server_name << endl;
-	if (conn_type == CONN_TYPE_TCPIP) cerr << "Port: " << tcpip_port << endl;
-	cerr << "Source: " << source_num << endl;
-}
-
-
-void RdsqOptions::show_usage()
-{
-	cerr << "Usage:" << endl;
-	cerr << "tmcimport [-s|-u <server>] <options>" << endl;
-	cerr << "-h : Show this help and exit." << endl;
-	cerr << "-v : Show version information and exit." << endl;
-	cerr << "-s <TCP/IP-Server>: Address/name of the machine where rdsd is running." << endl;
-	cerr << "-p <portnum>: TCP/IP port where rdsd is listening (default 4321)." << endl;
-	cerr << "-u <Unix socket>: Socket where rdsd is listening (default /var/tmp/rdsd.sock)" << endl;
-	cerr << "-n <srcnum>: Specify the RDS source number (see -e), default 0." << endl;
-	cerr << "-f specify file name to read from." << endl;
-	cerr << "-Ps <TCP/IP-Server>: Address/name of the machine where PosgreSQL is running." << endl;
-	cerr << "-Pp <portnum>: TCP/IP port where PosgreSQL is listening (default 5432)." << endl;
-	cerr << "-Pu <user>: PosgreSQL-User." << endl;
-	cerr << "-Px <password>: password of PosgreSQL-User." << endl;
-	cerr << "-Pn <dbname>: PosgreSQL-Database." << endl;
 }
 
 void RdsqOptions::show_version()
 {
 	cout << VERSION << endl;
-}
-
-bool RdsqOptions::try_str_to_int(char *s, int &result)
-{
-	if (! s) return false;
-	istringstream iss(s);
-	if (iss >> result) return true;
-	return false;
 }
