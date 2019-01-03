@@ -6,8 +6,8 @@
 
 using namespace std;
 
-// these values are hardcoded when event type defines end
-set<int> cancel_set = {128, 1589, 334, 2028, 625, 672, 673, 399, 468,
+// these values are hardcoded when event_type defines end of an event
+const set<int> cancel_set = {128, 1589, 334, 2028, 625, 672, 673, 399, 468,
 	2029, 801, 971, 2030, 1025, 1127, 1314, 1214, 1585, 2033, 1620, 2034,
 	2035, 1703, 1763, 1837, 1857, 1883, 2038,1911, 2039, 2040};
 
