@@ -15,7 +15,6 @@ var lines;
 var map = new L.map('map', {
 	preferCanvas: true
 }).setView([48.7758, 9.1829], 13).setMaxBounds(bounds);
-map.doubleClickZoom.disable();
 
 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 	center: map.getBounds().getCenter(),
