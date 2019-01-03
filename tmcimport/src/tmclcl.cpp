@@ -79,11 +79,11 @@ void TmcLCL::addOffset(string new_line) {
 	// remove special chars at end of line
 	boost::trim_right(strs.at(4));
 	if (! strs.at(2).empty())
-	    id = stoi(strs.at(2));
+		id = stoi(strs.at(2));
 	if (! strs.at(3).empty())
-	    neg = stoi(strs.at(3));
+		neg = stoi(strs.at(3));
 	if (! strs.at(4).empty())
-	    pos = stoi(strs.at(4));
+		pos = stoi(strs.at(4));
 	// inserting offset
 	data->insertOffset(id, neg, pos);
 }
