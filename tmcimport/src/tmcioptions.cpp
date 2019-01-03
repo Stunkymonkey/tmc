@@ -15,18 +15,18 @@ namespace po = boost::program_options;
 using namespace std;
 
 RdsqOptions::RdsqOptions():
-conn_type(CONN_TYPE_UNIX),
-server_name("/var/tmp/rdsd.sock"),
-tcpip_port(4321),
-source_num(0),
-event_mask(RDS_EVENT_TMC),
-file_name("test.tmc"),
-init(false),
-psql_host("127.0.0.1"),
-psql_port(5432),
-psql_database("tmc"),
-psql_user("tmc"),
-psql_password("")
+	conn_type(CONN_TYPE_UNIX),
+	server_name("/var/tmp/rdsd.sock"),
+	tcpip_port(4321),
+	source_num(0),
+	event_mask(RDS_EVENT_TMC),
+	file_name("test.tmc"),
+	init(false),
+	psql_host("127.0.0.1"),
+	psql_port(5432),
+	psql_database("tmc"),
+	psql_user("tmc"),
+	psql_password("")
 {
 }
 
@@ -48,11 +48,11 @@ bool RdsqOptions::ProcessCmdLine(int argc, char *argv[])
 		("unix-socket,u", po::value<string>()->default_value("/var/tmp/rdsd.sock"), "Socket where rdsd is listening")
 		("file,f", po::value<string>()->default_value("test.tmc"), "specify file name to read from")
 		("initialize,i", "for initializing the databases")
-		("postgre-server,", po::value<string>()->default_value("127.0.0.1"), "IP of PostgreSQL-server")
-		("postgre-port,", po::value<int>()->default_value(5432), "Port of PostgreSQL")
-		("postgre-database", po::value<string>()->default_value("tmc"), "PostgreSQL database-name")
-		("postgre-user,", po::value<string>()->default_value("tmc"), "PostgreSQL-User")
-		("postgre-password", po::value<string>()->default_value(""), "Password of PostgreSQL-User");
+		("postgre-server,S", po::value<string>()->default_value("127.0.0.1"), "IP of PostgreSQL-server")
+		("postgre-port,P", po::value<int>()->default_value(5432), "Port of PostgreSQL")
+		("postgre-database,D", po::value<string>()->default_value("tmc"), "PostgreSQL database-name")
+		("postgre-user,U", po::value<string>()->default_value("tmc"), "PostgreSQL-User")
+		("postgre-password,K", po::value<string>()->default_value(""), "Password of PostgreSQL-User");
 
 		po::variables_map vm;
 		po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -85,9 +85,7 @@ bool RdsqOptions::ProcessCmdLine(int argc, char *argv[])
 		if (vm.count("filename")) {
 			file_name = vm["filename"].as<string>();
 		}
-		if (vm.count("initialize")) {
-			init = true;
-		}
+		init = vm.count("initialize");
 
 		if (vm.count("postgre-server")) {
 			psql_host = vm["postgre-server"].as<string>();

@@ -1,6 +1,4 @@
-#ifndef STDRDSQOPTIONS_H
-#define STDRDSQOPTIONS_H
-
+#pragma once
 #include <librds.h>
 #include <string>
 
@@ -11,7 +9,6 @@ public:
 	RdsqOptions();
 	~RdsqOptions();
 	bool ProcessCmdLine(int argc, char *argv[]);
-	void ShowOptions();
 	int GetConnectionType() { return conn_type; }
 	const string& GetServerName() { return server_name; }
 	int GetPort() { return tcpip_port; }
@@ -39,5 +36,3 @@ private:
 	string psql_password;
 	void show_version();
 };
-
-#endif
