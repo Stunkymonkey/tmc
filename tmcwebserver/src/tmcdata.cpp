@@ -7,9 +7,8 @@ using namespace std;
 using namespace pqxx;
 
 TmcData::TmcData(string db_name, string user, string password, string hostaddr, string port) {
-	// TODO check parameter
-	// password not set
 	dbConfig = "dbname = " + db_name + " user = " + user;
+	// password not set
 	if (password != "") {
 		dbConfig = dbConfig + " password = " + password;
 	}
@@ -90,8 +89,6 @@ void TmcData::query(std::vector<struct TmcResult*>& out, double northEastLat, do
 					"AND events.start < '" + end_date + " 0:0'::TIMESTAMP + INTERVAL '1 day' "
 					"AND events.\"end\" >='" + start_date + " 0:0'"
 					") AS result LEFT JOIN event_type on event_type.id = result.event;";
-	// TODO daterange?
-	// @> 	contains range 	int4range(2,4) @> int4range(2,3)
 
 	cout << sql << endl;
 

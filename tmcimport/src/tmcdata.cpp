@@ -6,8 +6,8 @@ using namespace std;
 using namespace pqxx;
 
 TmcData::TmcData(string db_name, string user, string password, string hostaddr, string port) {
-	// TODO check parameter
 	dbConfig = "dbname = " + db_name + " user = " + user;
+	// password not set
 	if (password != "") {
 		dbConfig = dbConfig + " password = " + password;
 	}
