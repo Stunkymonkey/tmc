@@ -165,11 +165,14 @@ void TmcData::startSingleEvent(time_t time, int loc, int event, int ext, bool di
 	string update = "UPDATE events " \
 					"SET \"end\"=NULL " \
 					"WHERE " \
+					"\"end\"=to_timestamp(" + to_string(time) + ") AND " \
 					"lcd=" + to_string(loc) + " AND " \
 					"event=" + to_string(event) + " AND " \
 					"extension=" + to_string(ext) + " AND " \
 					"dir_negative=" + to_string(dir);
 	string sql = "WITH upsert AS (" + update + " RETURNING *) " + insert + " WHERE NOT EXISTS (SELECT * FROM upsert);";
+
+	//cout << sql << endl;
 
 	work W(*C);
 	W.exec( sql );
