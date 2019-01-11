@@ -36,16 +36,16 @@ bool RdswOptions::ProcessCmdLine(int argc, char *argv[]) {
 		po::options_description desc{"Options"};
 		desc.add_options()
 			("help,h", "Help screen")
-			("version,v", " Show version information and exit")
+			("version,v", "Show version information and exit")
 			("server,s", po::value<string>(), "IP-Address of the machine where webserver will run")
 			("threads,t", po::value<int>(), "amount of threads")
 			("port,p", po::value<int>(), "TCP/IP port where webserver will run")
 			("doc-root,d", po::value<string>(), "document root, where the html files can be found")
-			("postgre-server,S", po::value<string>()->default_value("127.0.0.1"), "IP of PostgreSQL-server")
-			("postgre-port,P", po::value<int>()->default_value(5432), "Port of PostgreSQL")
-			("postgre-database,D", po::value<string>()->default_value("tmc"), "PostgreSQL database-name")
-			("postgre-user,U", po::value<string>()->default_value("tmc"), "PostgreSQL-User")
-			("postgre-password,K", po::value<string>()->default_value(""), "Password of PostgreSQL-User");
+			("postgresql-server,S", po::value<string>()->default_value("127.0.0.1"), "IP of PostgreSQL-server")
+			("postgresql-port,P", po::value<int>()->default_value(5432), "Port of PostgreSQL")
+			("postgresql-database,D", po::value<string>()->default_value("tmc"), "PostgreSQL database-name")
+			("postgresql-user,U", po::value<string>()->default_value("tmc"), "PostgreSQL-User")
+			("postgresql-password,K", po::value<string>()->default_value(""), "Password of PostgreSQL-User");
 
 		po::variables_map vm;
 		po::store(po::parse_command_line(argc, argv, desc), vm);
