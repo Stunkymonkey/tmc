@@ -48,23 +48,25 @@ bool RdsqOptions::ProcessCmdLine(int argc, char *argv[])
 			("unix-socket,u", po::value<string>(), "Socket where rdsd is listening")
 			("filename,f", po::value<string>(), "specify file name to read from")
 			("initialize,i", "for initializing the databases")
-			("postgre-server,S", po::value<string>()->default_value("127.0.0.1"), "IP of PostgreSQL-server")
-			("postgre-port,P", po::value<int>()->default_value(5432), "Port of PostgreSQL")
-			("postgre-database,D", po::value<string>()->default_value("tmc"), "PostgreSQL database-name")
-			("postgre-user,U", po::value<string>()->default_value("tmc"), "PostgreSQL-User")
-			("postgre-password,K", po::value<string>()->default_value(""), "Password of PostgreSQL-User");
+			("postgresql-server,S", po::value<string>()->default_value("127.0.0.1"), "IP of PostgreSQL-server")
+			("postgresql-port,P", po::value<int>()->default_value(5432), "Port of PostgreSQL")
+			("postgresql-database,D", po::value<string>()->default_value("tmc"), "PostgreSQL database-name")
+			("postgresql-user,U", po::value<string>()->default_value("tmc"), "PostgreSQL-User")
+			("postgresql-password,K", po::value<string>()->default_value(""), "Password of PostgreSQL-User");
 
 		po::variables_map vm;
 		po::store(po::parse_command_line(argc, argv, desc), vm);
 		po::notify(vm);
 
-		if (vm.count("help") || (vm.count("unix-socket") && (vm.count("server") || vm.count("port")))) {
+		if (vm.count("help")) {
 			std::cout << desc << '\n';
 			exit(0);
-		}
-		else if (vm.count("version")) {
+		} else if (vm.count("version")) {
 			show_version();
 			exit(0);
+		} else if (vm.count("filename") || vm.count("unix-socket") || vm.count("server") || vm.count("port")) {
+			cout << "use only one input option and not mix socket with tcp/ip" << endl;
+			exit(1);
 		}
 
 		if (vm.count("server")) {
