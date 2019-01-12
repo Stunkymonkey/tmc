@@ -14,7 +14,7 @@
 namespace po = boost::program_options;
 using namespace std;
 
-RdsqOptions::RdsqOptions():
+TmciOptions::TmciOptions():
 	conn_type(CONN_TYPE_UNIX),
 	server_name("/var/tmp/rdsd.sock"),
 	tcpip_port(4321),
@@ -22,6 +22,7 @@ RdsqOptions::RdsqOptions():
 	event_mask(RDS_EVENT_TMC),
 	file_name(""),
 	init(false),
+	drop_additional_data(false),
 	psql_host("127.0.0.1"),
 	psql_port(5432),
 	psql_database("tmc"),
@@ -30,11 +31,11 @@ RdsqOptions::RdsqOptions():
 {
 }
 
-RdsqOptions::~RdsqOptions()
+TmciOptions::~TmciOptions()
 {
 }
 
-bool RdsqOptions::ProcessCmdLine(int argc, char *argv[])
+bool TmciOptions::ProcessCmdLine(int argc, char *argv[])
 {
 	try
 	{
@@ -48,6 +49,7 @@ bool RdsqOptions::ProcessCmdLine(int argc, char *argv[])
 			("unix-socket,u", po::value<string>(), "Socket where rdsd is listening")
 			("filename,f", po::value<string>(), "specify file name to read from")
 			("initialize,i", "for initializing the databases")
+			("dropgf,d", "drop additional event data for using less space")
 			("postgresql-server,S", po::value<string>()->default_value("127.0.0.1"), "IP of PostgreSQL-server")
 			("postgresql-port,P", po::value<int>()->default_value(5432), "Port of PostgreSQL")
 			("postgresql-database,D", po::value<string>()->default_value("tmc"), "PostgreSQL database-name")
@@ -58,15 +60,12 @@ bool RdsqOptions::ProcessCmdLine(int argc, char *argv[])
 		po::store(po::parse_command_line(argc, argv, desc), vm);
 		po::notify(vm);
 
-		if (vm.count("help")) {
+		if (vm.count("help") || (!vm.count("server") || vm.count("port"))) {
 			std::cout << desc << '\n';
 			exit(0);
 		} else if (vm.count("version")) {
 			show_version();
 			exit(0);
-		} else if (vm.count("filename") || vm.count("unix-socket") || vm.count("server") || vm.count("port")) {
-			cout << "use only one input option and not mix socket with tcp/ip" << endl;
-			exit(1);
 		}
 
 		if (vm.count("server")) {
@@ -88,6 +87,7 @@ bool RdsqOptions::ProcessCmdLine(int argc, char *argv[])
 			file_name = vm["filename"].as<string>();
 		}
 		init = vm.count("initialize");
+		drop_additional_data = vm.count("dropgf");
 
 		if (vm.count("postgre-server")) {
 			psql_host = vm["postgre-server"].as<string>();
@@ -112,7 +112,7 @@ bool RdsqOptions::ProcessCmdLine(int argc, char *argv[])
 	return true;
 }
 
-void RdsqOptions::show_version()
+void TmciOptions::show_version()
 {
 	cout << VERSION << endl;
 }

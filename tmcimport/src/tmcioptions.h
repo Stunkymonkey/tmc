@@ -4,10 +4,10 @@
 
 using namespace std;
 
-class RdsqOptions{
+class TmciOptions{
 public:
-	RdsqOptions();
-	~RdsqOptions();
+	TmciOptions();
+	~TmciOptions();
 	bool ProcessCmdLine(int argc, char *argv[]);
 	int GetConnectionType() { return conn_type; }
 	const string& GetServerName() { return server_name; }
@@ -16,6 +16,7 @@ public:
 	rds_events_t GetEventMask() { return event_mask; }
 	const string& GetFileName() { return file_name; }
 	const bool& GetInitState() { return init; }
+	const bool& DropGFData() { return drop_additional_data; }
 	const string& GetPsqlHost() { return psql_host; }
 	int GetPsqlPort() { return psql_port; }
 	const string& GetPsqlDatabase() { return psql_database; }
@@ -29,6 +30,7 @@ private:
 	rds_events_t event_mask;
 	string file_name;
 	bool init;
+	bool drop_additional_data;
 	string psql_host;
 	int psql_port;
 	string psql_database;

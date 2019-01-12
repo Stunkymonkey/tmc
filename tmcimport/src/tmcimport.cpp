@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 {
 	signal(SIGINT, sig_proc);
 
-	RdsqOptions opts;
+	TmciOptions opts;
 	if (! opts.ProcessCmdLine(argc, argv)) exit(1);
 
 
