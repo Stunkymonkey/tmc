@@ -4,10 +4,10 @@
 
 using namespace std;
 
-class RdslOptions{
+class TmclOptions{
 public:
-	RdslOptions();
-	~RdslOptions();
+	TmclOptions();
+	~TmclOptions();
 	bool ProcessCmdLine(int argc, char *argv[]);
 	int GetConnectionType() { return conn_type; }
 	const string& GetServerName() { return server_name; }

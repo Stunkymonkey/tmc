@@ -14,7 +14,7 @@
 namespace po = boost::program_options;
 using namespace std;
 
-RdslOptions::RdslOptions():
+TmclOptions::TmclOptions():
 	conn_type(CONN_TYPE_UNIX),
 	server_name("/var/tmp/rdsd.sock"),
 	tcpip_port(4321),
@@ -25,11 +25,11 @@ RdslOptions::RdslOptions():
 {
 }
 
-RdslOptions::~RdslOptions()
+TmclOptions::~TmclOptions()
 {
 }
 
-bool RdslOptions::ProcessCmdLine(int argc, char *argv[])
+bool TmclOptions::ProcessCmdLine(int argc, char *argv[])
 {
 	try
 	{
@@ -42,13 +42,13 @@ bool RdslOptions::ProcessCmdLine(int argc, char *argv[])
 			("port,p", po::value<int>(), "TCP/IP port where rdsd is listening")
 			("unix-socket,u", po::value<string>(), "Socket where rdsd is listening")
 			("filename,f", po::value<string>(), "specify file name to read from")
-			("clean,c", "clean file before writing");
+			("clean,c", "clean file before writing (default appending)");
 
 		po::variables_map vm;
 		po::store(po::parse_command_line(argc, argv, desc), vm);
 		po::notify(vm);
 
-		if (vm.count("help") || (vm.count("unix-socket") && (vm.count("server") || vm.count("port")))) {
+		if (vm.count("help") || (!vm.count("server") || vm.count("port"))) {
 			std::cout << desc << '\n';
 			exit(0);
 		}
@@ -87,7 +87,7 @@ bool RdslOptions::ProcessCmdLine(int argc, char *argv[])
 	return true;
 }
 
-void RdslOptions::show_version()
+void TmclOptions::show_version()
 {
 	cout << VERSION << endl;
 }
