@@ -50,41 +50,68 @@ void TmcData::initDatabase() {
 		return;
 	}
 
-	string points = 	"CREATE TABLE points (" \
-							"id SERIAL UNIQUE PRIMARY KEY," \
-							"point GEOMETRY" \
+	string points = 	"CREATE TABLE IF NOT EXISTS points ("
+							"id SERIAL UNIQUE PRIMARY KEY,"
+							"point GEOMETRY"
 						");";
-	string points_index = "CREATE INDEX areas_points ON points USING GIST (point);";
+	string points_index = "CREATE INDEX IF NOT EXISTS areas_points ON points USING GIST (point);";
 
-	string events = 	"CREATE TABLE events (" \
-							"id bigserial UNIQUE PRIMARY KEY," \
-							"\"start\" TIMESTAMP," \
-							"\"end\" TIMESTAMP, CHECK (\"start\" <= \"end\")," \
-							"lcd SERIAL," \
-							"event SERIAL," \
-							"extension SERIAL," \
-							"dir_negative BOOLEAN" \
+	string events = 	"CREATE TABLE IF NOT EXISTS events ("
+							"id bigserial UNIQUE PRIMARY KEY,"
+							"\"start\" TIMESTAMP,"
+							"\"end\" TIMESTAMP,"
+							"lcd SERIAL,"
+							"event SERIAL,"
+							"extension SERIAL,"
+							"dir_negative BOOLEAN"
 						");";
-	string time_index = "CREATE INDEX time_index ON events (start, \"end\");";
-	string events_info = 	"CREATE TABLE events_info (" \
-								"id bigserial," \
-								"CI SERIAL," \
-								"F1 SERIAL," \
-								"F2 SERIAL" \
+	string time_index = "CREATE INDEX IF NOT EXISTS time_index ON events (start, \"end\");";
+	string events_info = 	"CREATE TABLE events_info ("
+								"id bigserial,"
+								"CI SERIAL,"
+								"F1 SERIAL,"
+								"F2 SERIAL"
 							");";
 
-	string poffset = 	"CREATE TABLE point_offset (" \
-							"lcd SERIAL UNIQUE PRIMARY KEY," \
-							"positive SERIAL," \
-							"negative SERIAL," \
-							"positive_path GEOMETRY," \
-							"negative_path GEOMETRY" \
+	string poffset = 	"CREATE TABLE IF NOT EXISTS point_offset ("
+							"lcd SERIAL UNIQUE PRIMARY KEY,"
+							"positive SERIAL,"
+							"negative SERIAL,"
+							"positive_path GEOMETRY,"
+							"negative_path GEOMETRY"
 						");";
 
-	string event_type = "CREATE TABLE event_type (" \
-							"id SERIAL UNIQUE PRIMARY KEY ," \
-							"description VARCHAR(200)" \
+	string event_type = "CREATE TABLE  IF NOT EXISTS event_type ("
+							"id SERIAL UNIQUE PRIMARY KEY ,"
+							"description VARCHAR(200)"
 						");";
+
+	string get_path = 	"CREATE OR REPLACE FUNCTION get_path(INTEGER, INTEGER, BOOLEAN)"
+						"RETURNS TEXT AS $path$"
+						"	DECLARE"
+						"		tmp_lcd ALIAS FOR $1;"
+						"		extension ALIAS FOR $2;"
+						"		dir_negative ALIAS FOR $3;"
+						"		result TEXT;"
+						"	BEGIN"
+						"		SELECT CONCAT(ST_X(points.point), ':' , ST_Y(points.point)) INTO result FROM points WHERE points.id = tmp_lcd;"	
+						"		WHILE (0 < extension)"
+						"		LOOP"
+						"			IF dir_negative THEN"
+						"				SELECT negative INTO tmp_lcd FROM point_offset WHERE point_offset.lcd = tmp_lcd;"	
+						"			ELSE"
+						"				SELECT positive INTO tmp_lcd FROM point_offset WHERE point_offset.lcd = tmp_lcd;"	
+						"			END IF;"
+						"			IF tmp_lcd = 0 THEN"
+						"				EXIT;"
+						"			END IF;"
+						"			SELECT CONCAT(result, ',' , ST_X(points.point), ':' , ST_Y(points.point)) INTO result FROM points WHERE points.id = tmp_lcd;"	
+						"			extension = extension - 1;"
+						"		END LOOP;"
+						"		RETURN result;"
+						"	END;"
+						"	$path$"
+						"LANGUAGE plpgsql;";
 
 	work W(*C);
 	W.exec( points );
@@ -94,6 +121,7 @@ void TmcData::initDatabase() {
 	W.exec( events_info );
 	W.exec( poffset );
 	W.exec( event_type );
+	W.exec( get_path );
 	W.commit();
 	cout << "successfully created databases" << endl;
 }
