@@ -60,7 +60,7 @@ bool TmciOptions::ProcessCmdLine(int argc, char *argv[])
 		po::store(po::parse_command_line(argc, argv, desc), vm);
 		po::notify(vm);
 
-		if (vm.count("help") || (!vm.count("server") || vm.count("port"))) {
+		if (vm.count("help") || ((!vm.count("server") && vm.count("port")))) {
 			std::cout << desc << '\n';
 			exit(0);
 		} else if (vm.count("version")) {
