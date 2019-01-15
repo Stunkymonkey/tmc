@@ -38,12 +38,12 @@ bool TmcWriter::write(string s) {
 	// the last char is always some weird char, so remove it
 	s.pop_back();
 	if (s == last_s) {
-		cout << "dup: " << str_time << endl;
+		//cout << "dup: " << str_time << endl;
 		bzip2Filter << "dup: " << str_time << endl;
 	} else {
-		cout << "tmc: " << str_time << endl;
+		//cout << "tmc: " << str_time << endl;
 		bzip2Filter << "tmc: " << str_time << endl;
-		cout << s << endl;
+		//cout << s << endl;
 		bzip2Filter << s << endl;
 	}
 	last_s = s;
