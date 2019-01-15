@@ -14,6 +14,5 @@ private:
 	void processLine(time_t time, std::string line, bool isNew, int index);
 	TmcData *data;
 	bool dropGFData;
-	// TODO test
 	int ci_index[5] = { };
 };

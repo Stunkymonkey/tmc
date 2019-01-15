@@ -40,7 +40,6 @@ void TmcFilter::addChunk(string new_string) {
 		strptime(time_str.c_str(), "%FT%T", &tm);
 		rawtime = mktime(&tm);
 	} else {
-		// TODO test
 		time(&rawtime);
 	}
 
