@@ -178,48 +178,40 @@ void TmcData::insertEventType(int eventcode, string desc) {
 	W.commit();
 }
 
-void TmcData::startSingleEvent(time_t time, int loc, int event, int ext, bool dir) {
+int TmcData::startSingleEvent(time_t time, int loc, int event, int ext, bool dir) {
 	if (!C->is_open()) {
 		cout << "Database closed unexpected" << endl;
-		return;
+		return 0;
 	}
-	string insert =	"INSERT INTO events (\"start\", \"end\", lcd, event, extension, dir_negative) " \
-					"SELECT " \
-					"to_timestamp(" + to_string(time) + "), " \
-					"NULL, " \
-					"" + to_string(loc) + ", " \
-					"" + to_string(event) + ", " \
-					"" + to_string(ext) + ", " \
-					"" + to_string(dir) + "::BOOLEAN";
-	string update = "UPDATE events " \
-					"SET \"end\"=NULL " \
-					"WHERE " \
-					"\"end\"=to_timestamp(" + to_string(time) + ") AND " \
-					"lcd=" + to_string(loc) + " AND " \
-					"event=" + to_string(event) + " AND " \
-					"extension=" + to_string(ext) + " AND " \
-					"dir_negative=" + to_string(dir);
-	string sql = "WITH upsert AS (" + update + " RETURNING *) " + insert + " WHERE NOT EXISTS (SELECT * FROM upsert);";
+	string sql =	"INSERT INTO events (\"start\", \"end\", lcd, event, extension, dir_negative) "
+					"SELECT "
+					"to_timestamp(" + to_string(time) + "), "
+					"NULL, "
+					"" + to_string(loc) + ", "
+					"" + to_string(event) + ", "
+					"" + to_string(ext) + ", "
+					"" + to_string(dir) + "::BOOLEAN "
+					"RETURNING id;";
 
 	//cout << sql << endl;
 
-	work W(*C);
-	W.exec( sql );
-	W.commit();
+	nontransaction N(*C);
+	result R( N.exec( sql ));
+
+	// no need to iterate over result, because it only has one line
+	return R.begin()[0].as<int>();
 }
 
-void TmcData::endSingleEvent(time_t time, int loc, int ext, bool dir) {
+void TmcData::endSingleEvent(int index, time_t time, int loc, int ext, bool dir) {
 	if (!C->is_open()) {
 		cout << "Database closed unexpected" << endl;
 		return;
 	}
 
-	string sql = 	"UPDATE events " \
-					"SET \"end\" = to_timestamp(" + to_string(time) + ") " \
-					"WHERE (lcd = " + to_string(loc) + ") AND (\"end\" IS NULL) " \
-					"AND (extension = " + to_string(ext) + ") " \
-					"AND (dir_negative = " + to_string(dir) + "::BOOLEAN);";
-
+	string sql = 	"UPDATE events "
+					"SET \"end\" = to_timestamp(" + to_string(time) + ") "
+					"WHERE \"end\" IS NULL AND id = " + to_string(index) + ";";
+	
 	work W(*C);
 	W.exec( sql );
 	W.commit();
@@ -232,46 +224,32 @@ int TmcData::startGroupEvent(time_t time, int loc, int event, int ext, bool dir)
 		return 0;
 	}
 
-	string insert =	"INSERT INTO events (\"start\", \"end\", lcd, event, extension, dir_negative) " \
-					"SELECT " \
-					"to_timestamp(" + to_string(time) + "), " \
-					"NULL, " \
-					"" + to_string(loc) + ", " \
-					"" + to_string(event) + ", " \
-					"" + to_string(ext) + ", " \
-					"" + to_string(dir) + "::BOOLEAN ";
-	string update = "UPDATE events " \
-					"SET \"end\"=NULL " \
-					"WHERE " \
-					"lcd=" + to_string(loc) + " AND " \
-					"event=" + to_string(event) + " AND " \
-					"extension=" + to_string(ext) + " AND " \
-					"dir_negative=" + to_string(dir);
-	string sql = "WITH upsert AS (" + update + " RETURNING *) " + insert + " WHERE NOT EXISTS (SELECT * FROM upsert);";
+	string sql =	"INSERT INTO events (\"start\", \"end\", lcd, event, extension, dir_negative) "
+					"SELECT "
+					"to_timestamp(" + to_string(time) + "), "
+					"NULL, "
+					"" + to_string(loc) + ", "
+					"" + to_string(event) + ", "
+					"" + to_string(ext) + ", "
+					"" + to_string(dir) + "::BOOLEAN "
+					"RETURNING id;";
 
 	nontransaction N(*C);
 	result R( N.exec( sql ));
 
-	// TODO return id with " RETURNING id"
-
-	int id;
-	for (result::const_iterator c = R.begin(); c != R.end(); ++c) {
-		id = c[0].as<int>();
-	}
-	return id;
+	// no need to iterate over result, because it only has one line
+	return R.begin()[0].as<int>();
 }
 
-void TmcData::endGroupEvent(time_t time, int loc, int ext, bool dir) {
+void TmcData::endGroupEvent(int index, time_t time, int loc, int ext, bool dir) {
 	if (!C->is_open()) {
 		cout << "Database closed unexpected" << endl;
 		return;
 	}
 
-	string sql = 	"UPDATE events " \
-					"SET \"end\" = to_timestamp(" + to_string(time) + ") " \
-					"WHERE (lcd = " + to_string(loc) + ") AND (\"end\" IS NULL) " \
-					"AND (extension = " + to_string(ext) + ") " \
-					"AND (dir_negative = " + to_string(dir) + "::BOOLEAN);";
+	string sql = 	"UPDATE events "
+					"SET \"end\" = to_timestamp(" + to_string(time) + ") "
+					"WHERE \"end\" IS NULL AND id = " + to_string(index) + ";";
 
 	work W(*C);
 	W.exec( sql );
@@ -287,11 +265,11 @@ void TmcData::addGroupEventInfo(int id, int ci, int f1, int f2) {
 		return;
 	}
 
-	string sql = 	"INSERT INTO events_info (id, ci, f1, f2) " \
-					"VALUES ( " \
-					"" + to_string(id) + ", " \
-					"" + to_string(ci) + ", " \
-					"" + to_string(f1) + ", " \
+	string sql = 	"INSERT INTO events_info (id, ci, f1, f2) "
+					"VALUES ( "
+					"" + to_string(id) + ", "
+					"" + to_string(ci) + ", "
+					"" + to_string(f1) + ", "
 					"" + to_string(f2) + "); ";
 
 	work W(*C);
