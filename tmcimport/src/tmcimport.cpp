@@ -94,30 +94,32 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	TmcFilter *manager = new TmcFilter(data);
+	TmcFilter *manager = new TmcFilter(data, opts.DropGFData());
 
-	TmcReader *reader = new TmcReader(opts.GetFileName());
+	string file_name = opts.GetFileName();
+	// if filename is given import file else use rds-device
+	if (file_name != "") {
+		TmcReader *reader = new TmcReader(file_name);
 
-	string chunk = "";
-	int i = 0;
-	while (reader->getChunk(chunk)) {
-		// std::cout << "processed chunks: " << i << "\r";
-		i ++;
-		manager->addChunk(chunk);
+		string chunk = "";
+		int i = 0;
+		while (reader->getChunk(chunk)) {
+			// std::cout << "processed chunks: " << i << "\r";
+			i ++;
+			manager->addChunk(chunk);
+		}
+		delete reader;
+
+		// if there are events unfinished, this will end them.
+		std::istringstream last_chunk(chunk);
+		std::string last_timestamp;
+		std::getline(last_chunk, last_timestamp);
+		last_timestamp += "\nend";
+		manager->addChunk(last_timestamp);
+		return 0;
 	}
-	delete reader;
 
-	// if there are events unfinished, this will end them.
-	std::istringstream last_chunk(chunk);
-	std::string last_timestamp;
-	std::getline(last_chunk, last_timestamp);
-	last_timestamp += "\nend";
-	manager->addChunk(last_timestamp);
-
-	// remove for live
-	// TODO fix mem-leak in manager
-	return 0;
-
+	// continue here for rds device
 	RdsQueryHandler rds;
 
 	hnd = rds_create_connection_object();
@@ -157,7 +159,7 @@ int main(int argc, char *argv[])
 		clean_exit(hnd);
 	}
 
-	while (RDS_OK == rds_get_event(hnd,opts.GetSourceNum(),&events)){
+	while (RDS_OK == rds_get_event(hnd, opts.GetSourceNum(), &events)){
 		if (events & RDS_EVENT_TMC) {
 			string ret = rds.ShowTMCList();
 			manager->addChunk(ret);
