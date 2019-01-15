@@ -1,6 +1,7 @@
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
 #include <iostream>
+#include <set>
 
 #include "tmcfilter.h"
 
@@ -10,9 +11,11 @@ using namespace std;
 const set<int> cancel_set = {128, 1589, 334, 2028, 625, 672, 673, 399, 468,
 	2029, 801, 971, 2030, 1025, 1127, 1314, 1214, 1585, 2033, 1620, 2034,
 	2035, 1703, 1763, 1837, 1857, 1883, 2038,1911, 2039, 2040};
+list<int> indexes = {};
 
-TmcFilter::TmcFilter(TmcData *new_data) {
+TmcFilter::TmcFilter(TmcData *new_data, bool DropGFData) {
 	data = new_data;
+	dropGFData = DropGFData;
 }
 
 TmcFilter::~TmcFilter() {
@@ -42,15 +45,23 @@ void TmcFilter::addChunk(string new_string) {
 	}
 
 	vector<string>::iterator it = old_strings.begin();
+	std::list<int>::iterator current_id = indexes.begin();
 
 	while (it != old_strings.end()) {
 		// check if strings are equal
 		if (*it == *tok_iter){
 			tok_iter++;
 			it++;
+			current_id++;
 		} else {
 			// removed lines
-			processLine(rawtime, *it, false);
+			processLine(rawtime, *it, false, *current_id);
+
+			// remove index by iterator
+			std::list<int>::iterator tmp = current_id;
+			current_id++;
+			indexes.erase(tmp);
+
 			old_strings.erase(it);
 		}
 	}
@@ -58,12 +69,12 @@ void TmcFilter::addChunk(string new_string) {
 	while (tok_iter != tokens.end() && *tok_iter != "end") {
 		// new lines
 		old_strings.push_back(*tok_iter);
-		processLine(rawtime, *tok_iter, true);
+		processLine(rawtime, *tok_iter, true, *current_id);
 		tok_iter++;
 	}
 }
 
-void TmcFilter::printEvent(time_t time, std::string line, bool isNew) {
+void TmcFilter::printEvent(time_t time, std::string line, bool isNew, int index) {
 	// debug helper
 	struct tm *timeinfo;
 	char buffer[80];
@@ -72,20 +83,23 @@ void TmcFilter::printEvent(time_t time, std::string line, bool isNew) {
 	strftime(buffer,sizeof(buffer),"%FT%T",timeinfo);
 	std::string time_str(buffer);
 	if (isNew) {
-		cout << time_str <<"\tnew:\t" << line << endl;
+		cout << time_str <<"\tnew:\t" << line << " : " << index << endl;
 	} else {
-		cout << time_str <<"\told:\t" << line << endl;
+		cout << time_str <<"\told:\t" << line << " : " << index << endl;
 	}
 }
 
 
-void TmcFilter::processLine(time_t time, std::string line, bool isNew) {
+void TmcFilter::processLine(time_t time, std::string line, bool isNew, int index) {
 	// Y displays the current sender
 	// T is an encrypted message
 	if (line.front() == 'Y' || line.front() == 'T') {
+		if (isNew) {
+			indexes.push_back(0);
+		}
 		return;
 	}
-	//printEvent(time, line, isNew);
+	//printEvent(time, line, isNew, index);
 
 	vector<string> strs;
 	// this splits the line into strs by spliting at '=' and spaces
@@ -101,14 +115,15 @@ void TmcFilter::processLine(time_t time, std::string line, bool isNew) {
 		if (!(cancel_set.find(event) != cancel_set.end())) {
 			// event type is not canceling
 			if (isNew) {
-				data->startSingleEvent(time, loc, event, ext, dir);
+				indexes.push_back(data->startSingleEvent(time, loc, event, ext, dir));
 			} else {
-				data->endSingleEvent(time, loc, ext, dir);
+				data->endSingleEvent(index, time, loc, ext, dir);
 			}
 		} else {
 			// event type is canceling
 			if (isNew) {
-				data->endSingleEvent(time, loc, ext, dir);
+				data->endSingleEvent(index, time, loc, ext, dir);
+				indexes.push_back(0);
 			}
 		}
 		
@@ -122,22 +137,26 @@ void TmcFilter::processLine(time_t time, std::string line, bool isNew) {
 		if (!(cancel_set.find(event) != cancel_set.end())) {
 			// event type is not canceling
 			if (isNew) {
-				ci_index[ci - 1] = data->startGroupEvent(time, loc, event, ext, dir);
+				int id = data->startGroupEvent(time, loc, event, ext, dir);
+				indexes.push_back(id);
+				ci_index[ci - 1] = id;
 			} else {
-				data->endGroupEvent(time, loc, ext, dir);
+				data->endGroupEvent(index, time, loc, ext, dir);
 			}
 		} else {
 			if (isNew) {
-				data->endGroupEvent(time, loc, ext, dir);
+				data->endGroupEvent(index, time, loc, ext, dir);
+				indexes.push_back(0);
 			}
 		}
-	} else if ((strs.size() == 9) && ((strs[0].compare("GS")) == 0)) {
+	} else if (!dropGFData && ((strs.size() == 9) && ((strs[0].compare("GS")) == 0))) {
 		// following group events
 		int ci = stoi(strs[2]);
 		int f1 = stoi(strs[6]);
 		int f2 = stoi(strs[8]);
 		if (isNew) {
 			data->addGroupEventInfo(ci_index[ci - 1], ci, f1, f2);
+			indexes.push_back(0);
 		}
 	} else {
 		cerr << "Invalid format" << endl;
