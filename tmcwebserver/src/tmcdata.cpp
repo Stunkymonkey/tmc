@@ -45,13 +45,12 @@ bool TmcData::checkConnection() {
 }
 
 tuple<std::string, std::string> TmcData::minMaxDate() {
-	// return id of event, because it is needed for additional group infos
 	if (!C->is_open()) {
 		cout << "Database closed unexpected" << endl;
 		return make_tuple("", "");
 	}
 
-	string sql = "SELECT MIN(\"start\"), MAX(\"end\") FROM events;";
+	string sql = "SELECT MIN(\"start\")::date, MAX(\"end\")::date FROM events;";
 
 	nontransaction N(*C);
 	result R( N.exec( sql ));
