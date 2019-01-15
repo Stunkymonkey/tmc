@@ -133,10 +133,10 @@ void TmcData::insertLcd(int id, float x, float y) {
 		return;
 	}
 
-	string sql = 	"INSERT INTO points (id, point) " \
-					"VALUES ( " \
-					"" + to_string(id) + ", " \
-					"ST_Point(" + to_string(x) + "," + to_string(y) + "))" \
+	string sql = 	"INSERT INTO points (id, point) "
+					"VALUES ( "
+					"" + to_string(id) + ", "
+					"ST_Point(" + to_string(x) + "," + to_string(y) + "))"
 					"ON CONFLICT DO NOTHING;";
 
 	work W(*C);
@@ -150,11 +150,11 @@ void TmcData::insertOffset(int lcd, int neg, int pos) {
 		return;
 	}
 
-	string sql = 	"INSERT INTO point_offset (lcd, negative, positive) " \
-					"VALUES ( " \
-					"" + to_string(lcd) + ", " \
-					"" + to_string(neg) + ", " \
-					"" + to_string(pos) + ")" \
+	string sql = 	"INSERT INTO point_offset (lcd, negative, positive) "
+					"VALUES ( "
+					"" + to_string(lcd) + ", "
+					"" + to_string(neg) + ", "
+					"" + to_string(pos) + ")"
 					"ON CONFLICT DO NOTHING;";
 	work W(*C);
 	W.exec( sql );
@@ -167,10 +167,10 @@ void TmcData::insertEventType(int eventcode, string desc) {
 		return;
 	}
 
-	string sql = 	"INSERT INTO event_type (id, description) " \
-					"VALUES ( " \
-					"" + to_string(eventcode) + ", " \
-					"" + desc + ")" \
+	string sql = 	"INSERT INTO event_type (id, description) "
+					"VALUES ( "
+					"" + to_string(eventcode) + ", "
+					"" + desc + ")"
 					"ON CONFLICT DO NOTHING;";
 
 	work W(*C);
