@@ -14,7 +14,7 @@
 namespace po = boost::program_options;
 using namespace std;
 
-RdswOptions::RdswOptions():
+TmcwOptions::TmcwOptions():
 	web_ip("127.0.0.1"),
 	web_port(8081),
 	threads(1),
@@ -27,10 +27,10 @@ RdswOptions::RdswOptions():
 {
 }
 
-RdswOptions::~RdswOptions() {
+TmcwOptions::~TmcwOptions() {
 }
 
-bool RdswOptions::ProcessCmdLine(int argc, char *argv[]) {
+bool TmcwOptions::ProcessCmdLine(int argc, char *argv[]) {
 	try
 	{
 		po::options_description desc{"Options"};
@@ -95,6 +95,6 @@ bool RdswOptions::ProcessCmdLine(int argc, char *argv[]) {
 	return true;
 }
 
-void RdswOptions::show_version() {
+void TmcwOptions::show_version() {
 	cout << VERSION << endl;
 }

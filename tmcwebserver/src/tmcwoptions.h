@@ -3,10 +3,10 @@
 
 using namespace std;
 
-class RdswOptions{
+class TmcwOptions{
 public:
-	RdswOptions();
-	~RdswOptions();
+	TmcwOptions();
+	~TmcwOptions();
 	bool ProcessCmdLine(int argc, char *argv[]);
 	const string& GetServerName() { return web_ip; }
 	int GetPort() { return web_port; }

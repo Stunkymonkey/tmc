@@ -504,7 +504,7 @@ public:
 
 int main(int argc, char *argv[]) {
 	// Check command line arguments.
-	RdswOptions opts;
+	TmcwOptions opts;
 	if (! opts.ProcessCmdLine(argc,argv)) exit(1);
 
 	boost::asio::ip::address address = boost::asio::ip::make_address(opts.GetServerName());
