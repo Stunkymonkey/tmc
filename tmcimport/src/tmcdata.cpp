@@ -48,6 +48,7 @@ void TmcData::initDatabase() {
 		cout << "Database closed unexpected" << endl;
 		return;
 	}
+	string postgis = "CREATE EXTENSION postgis;";
 
 	string points = 	"CREATE TABLE IF NOT EXISTS points ("
 							"id SERIAL UNIQUE PRIMARY KEY,"
@@ -113,6 +114,7 @@ void TmcData::initDatabase() {
 						"LANGUAGE plpgsql;";
 
 	work W(*C);
+	W.exec( postgis );
 	W.exec( points );
 	W.exec( points_index );
 	W.exec( events );
