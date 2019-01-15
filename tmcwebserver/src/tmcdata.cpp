@@ -64,31 +64,62 @@ tuple<std::string, std::string> TmcData::minMaxDate() {
 	return make_tuple(min, max);
 }
 
-void TmcData::query(std::vector<struct TmcResult*>& out, double northEastLat, double  northEastLng, double southWestLat, double southWestLng, string start_date, string end_date, string start_time, string end_time) {
-	// return id of event, because it is needed for additional group infos
+void TmcData::query(std::vector<struct TmcResult*>& out,
+					double northEastLat,
+					double northEastLng,
+					double southWestLat,
+					double southWestLng,
+					string start_date,
+					string end_date,
+					string start_time,
+					string end_time) {
 	if (!C->is_open()) {
 		cout << "Database closed unexpected" << endl;
 		return;
 	}
+	string sql;
+	// whether time is defined or not
+	if (start_time == end_time) {
+		sql =	"SELECT event_type.description, result.start, COALESCE(result.\"end\", NOW()::timestamp), result.path FROM ("
+				"SELECT events.event, "
+					"events.start, "
+					"events.\"end\", "
+					"get_path(events.lcd, events.extension, events.dir_negative) AS \"path\" "
+				"FROM points "
+				"INNER JOIN events ON events.lcd = points.id "
+				"WHERE ST_Contains(ST_MakeEnvelope("
+					+ to_string(southWestLng) + ", "
+					+ to_string(southWestLat) + ", "
+					+ to_string(northEastLng) + ", "
+					+ to_string(northEastLat) +
+				"), points.point) "
+				"AND events.start < '" + end_date + " 0:0'::TIMESTAMP + INTERVAL '1 day' "
+				"AND events.\"end\" >='" + start_date + " 0:0'"
+				") AS result LEFT JOIN event_type on event_type.id = result.event;";
+	} else {
+		sql =	"SELECT event_type.description, result.start, COALESCE(result.\"end\", NOW()::timestamp), result.path FROM ("
+				"SELECT events.event, "
+					"events.start, "
+					"events.\"end\", "
+					"get_path(events.lcd, events.extension, events.dir_negative) AS \"path\" "
+				"FROM points "
+				"INNER JOIN events ON events.lcd = points.id "
+				"WHERE ST_Contains(ST_MakeEnvelope("
+					+ to_string(southWestLng) + ", "
+					+ to_string(southWestLat) + ", "
+					+ to_string(northEastLng) + ", "
+					+ to_string(northEastLat) +
+				"), points.point) "
+				"AND events.start < '" + end_date + " 0:0'::TIMESTAMP + INTERVAL '1 day' "
+				"AND events.\"end\" >='" + start_date + " 0:0' "
+				"AND EXTRACT(HOUR FROM events.start) >= " + start_time + " "
+				"AND EXTRACT(HOUR FROM events.start) < " + end_time + " "
+				"AND EXTRACT(HOUR FROM events.\"end\") >= " + start_time + " "
+				"AND EXTRACT(HOUR FROM events.\"end\") < " + end_time + " "
+				") AS result LEFT JOIN event_type on event_type.id = result.event;";
+	}
 
-	string sql =	"SELECT event_type.description, result.start, result.\"end\", result.path FROM ("
-						"SELECT events.event, "
-							"events.start, "
-							"events.\"end\", "
-							"get_path(events.lcd, events.extension, events.dir_negative) AS \"path\" "
-					"FROM points "
-					"INNER JOIN events ON events.lcd = points.id "
-					"WHERE ST_Contains(ST_MakeEnvelope("
-						+ to_string(southWestLng) + ", "
-						+ to_string(southWestLat) + ", "
-						+ to_string(northEastLng) + ", "
-						+ to_string(northEastLat) +
-					"), points.point) "
-					"AND events.start < '" + end_date + " 0:0'::TIMESTAMP + INTERVAL '1 day' "
-					"AND events.\"end\" >='" + start_date + " 0:0'"
-					") AS result LEFT JOIN event_type on event_type.id = result.event;";
-
-	cout << sql << endl;
+	//cout << sql << endl;
 
 	nontransaction N(*C);
 	result R( N.exec( sql ));
