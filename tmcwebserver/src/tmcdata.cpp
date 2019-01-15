@@ -16,13 +16,12 @@ TmcData::TmcData(string db_name, string user, string password, string hostaddr, 
 	
 	try {
 		C = new pqxx::connection(dbConfig);
-		if (C->is_open()) {
-			cout << "Opened database successfully: " << C->dbname() << endl;
-		} else {
-			cout << "Can't open database" << endl;
-		}
 	} catch (const std::exception &e) {
 		cerr << e.what() << std::endl;
+		exit(1);
+	}
+	if (C->is_open()) {
+		cout << "Opened database successfully: " << C->dbname() << endl;
 	}
 }
 
