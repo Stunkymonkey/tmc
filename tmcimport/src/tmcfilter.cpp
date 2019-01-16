@@ -36,9 +36,12 @@ void TmcFilter::addChunk(string new_string) {
 	// if line provides time use it or create it
 	if (header.length() ==24) {
 		string time_str = header.substr(5, 19);
-		struct tm tm;
-		strptime(time_str.c_str(), "%FT%T", &tm);
-		rawtime = mktime(&tm);
+		struct tm tm = { 0 };
+		if (strptime(time_str.c_str(), "%FT%T", &tm)) {
+			rawtime = mktime(&tm);
+		} else {
+			cout << "strptime failed" << endl;
+		}
 	} else {
 		time(&rawtime);
 	}
@@ -138,7 +141,7 @@ void TmcFilter::processLine(time_t time, std::string line, bool isNew, int index
 			if (isNew) {
 				int id = data->startGroupEvent(time, loc, event, ext, dir);
 				indexes.push_back(id);
-				ci_index[ci - 1] = id;
+				ci_index.at(ci - 1) = id;
 			} else {
 				data->endGroupEvent(index, time, loc, ext, dir);
 			}
@@ -154,7 +157,7 @@ void TmcFilter::processLine(time_t time, std::string line, bool isNew, int index
 		int f1 = stoi(strs[6]);
 		int f2 = stoi(strs[8]);
 		if (isNew) {
-			data->addGroupEventInfo(ci_index[ci - 1], ci, f1, f2);
+			data->addGroupEventInfo(ci_index.at(ci - 1), ci, f1, f2);
 			indexes.push_back(0);
 		}
 	} else {
