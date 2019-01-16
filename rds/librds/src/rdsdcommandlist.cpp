@@ -29,6 +29,7 @@ RdsdCommandList::RdsdCommandList()
 
 RdsdCommandList::~RdsdCommandList()
 {
+  Clear();
 }
 
 void RdsdCommandList::Clear()
