@@ -4,6 +4,13 @@ using namespace std;
 
 TmcReader::TmcReader(string filename)
 {
+	FILE* fp = fopen(filename.c_str(), "r");
+	if (fp) {
+		fclose(fp);
+	} else {
+		cerr << file_name << " does not exist." << endl;
+		exit(1);
+	}
 	file_name = filename;
 	boost::iostreams::file_source myCprdFile (filename, std::ios_base::in | std::ios_base::binary);
 
