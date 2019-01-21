@@ -129,10 +129,10 @@ void TmcData::query(std::vector<struct TmcResult*>& out,
 	for (result::const_iterator c = R.begin(); c != R.end(); ++c) {
 		TmcResult *tmp = new TmcResult();
 		// read all to TmcResult
-		tmp->event = c[0].as<std::string>();
-		tmp->start = c[1].as<std::string>();
-		tmp->end = c[2].as<std::string>();
-		tmp->path = c[3].as<std::string>();
+		tmp->event = (c[0].is_null()) ? "" : c[0].as<std::string>();
+		tmp->start = (c[1].is_null()) ? "" : c[1].as<std::string>();
+		tmp->end = (c[2].is_null()) ? "" : c[2].as<std::string>();
+		tmp->path = (c[3].is_null()) ? "" : c[3].as<std::string>();
 		out.push_back(tmp);
 	}
 	return;
