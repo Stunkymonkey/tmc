@@ -188,40 +188,35 @@ handle_request(
 		res.set(http::field::content_type, "application/json");
 		res.keep_alive(req.keep_alive());
 
-		try {
-			double northEastLat;
-			double northEastLng;
-			double southWestLat;
-			double southWestLng;
-			std::string start_date;
-			std::string end_date;
-			std::string start_time;
-			std::string end_time;
-			bool valid_json = TmcJson::tmc_request(req.body(), northEastLat, northEastLng, southWestLat, southWestLng, start_date, end_date, start_time, end_time);
-			if (!valid_json) {
-				return send(bad_request("invalid json in query-request"));
-			}
-
-			// average of distance is ~0.02°
-			// add to 0.1 so events outside the border will be displayed
-			northEastLat = northEastLat + 0.1;
-			northEastLng = northEastLng + 0.1;
-			southWestLat = southWestLat - 0.1;
-			southWestLng = southWestLng - 0.1;
-
-			std::vector<struct TmcResult*> out;
-			data->query(out, northEastLat, northEastLng, southWestLat, southWestLng, start_date, end_date, start_time, end_time);
-			std::string finalString = TmcJson::tmc_query(out);
-
-			//std::cout << TmcJson::tmc_query(out);
-
-			boost::beast::ostream(res.body())
-			<< TmcJson::tmc_query(out);
-			return send(std::move(res));
-		} catch (...) {
-			std::cout << "unknown error in query-request" << std::endl;
-			return send(server_error("unknown error in query-request"));
+		double northEastLat;
+		double northEastLng;
+		double southWestLat;
+		double southWestLng;
+		std::string start_date;
+		std::string end_date;
+		std::string start_time;
+		std::string end_time;
+		bool valid_json = TmcJson::tmc_request(req.body(), northEastLat, northEastLng, southWestLat, southWestLng, start_date, end_date, start_time, end_time);
+		if (!valid_json) {
+			return send(bad_request("invalid json in query-request"));
 		}
+
+		// average of distance is ~0.02°
+		// add to 0.1 so events outside the border will be displayed
+		northEastLat = northEastLat + 0.1;
+		northEastLng = northEastLng + 0.1;
+		southWestLat = southWestLat - 0.1;
+		southWestLng = southWestLng - 0.1;
+
+		std::vector<struct TmcResult*> out;
+		data->query(out, northEastLat, northEastLng, southWestLat, southWestLng, start_date, end_date, start_time, end_time);
+		std::string finalString = TmcJson::tmc_query(out);
+
+		//std::cout << TmcJson::tmc_query(out);
+
+		boost::beast::ostream(res.body())
+		<< TmcJson::tmc_query(out);
+		return send(std::move(res));
 	}
 	else if(req.method() == http::verb::post)
 	{
