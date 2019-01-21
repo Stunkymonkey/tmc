@@ -164,6 +164,8 @@ void TmcFilter::processLine(time_t time, std::string line, bool isNew, int index
 			indexes.push_back(0);
 		}
 	} else {
-		cerr << "Invalid format" << endl;
+		indexes.push_back(0);
+		cerr << "Invalid format: ";
+		printEvent(time, line, isNew, index);
 	}
 }
