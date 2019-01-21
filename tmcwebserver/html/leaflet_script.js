@@ -3,9 +3,9 @@ var timeline;
 var slider;
 
 var bounds = [
-    [47.2, 5.8], // Southwest coordinates
-    [55.1, 15.4]  // Northeast coordinates
-    ];
+	[47.2, 5.8], // Southwest coordinates
+	[55.1, 15.4]  // Northeast coordinates
+];
 
 var isOverlayPointsDrawn = false;
 var isOverlayLinesDrawn = false;
