@@ -48,7 +48,7 @@ void TmcData::initDatabase() {
 		cout << "Database closed unexpected" << endl;
 		return;
 	}
-	string postgis = "CREATE EXTENSION postgis;";
+	string postgis = "CREATE EXTENSION IF NOT EXISTS postgis;";
 
 	string points = 	"CREATE TABLE IF NOT EXISTS points ("
 							"id SERIAL UNIQUE PRIMARY KEY,"
@@ -60,6 +60,7 @@ void TmcData::initDatabase() {
 							"id bigserial UNIQUE PRIMARY KEY,"
 							"\"start\" TIMESTAMP,"
 							"\"end\" TIMESTAMP,"
+							//"\"end\" TIMESTAMP, CHECK (\"start\" <= \"end\"),"
 							"lcd SERIAL,"
 							"event SERIAL,"
 							"extension SERIAL,"
@@ -68,17 +69,15 @@ void TmcData::initDatabase() {
 	string time_index = "CREATE INDEX IF NOT EXISTS time_index ON events (start, \"end\");";
 	string events_info = 	"CREATE TABLE events_info ("
 								"id bigserial,"
-								"CI SERIAL,"
-								"F1 SERIAL,"
-								"F2 SERIAL"
+								"gsi SERIAL,"
+								"f1 SERIAL,"
+								"f2 SERIAL"
 							");";
 
 	string poffset = 	"CREATE TABLE IF NOT EXISTS point_offset ("
 							"lcd SERIAL UNIQUE PRIMARY KEY,"
 							"positive SERIAL,"
-							"negative SERIAL,"
-							"positive_path GEOMETRY,"
-							"negative_path GEOMETRY"
+							"negative SERIAL"
 						");";
 
 	string event_type = "CREATE TABLE  IF NOT EXISTS event_type ("
@@ -124,7 +123,6 @@ void TmcData::initDatabase() {
 	W.exec( event_type );
 	W.exec( get_path );
 	W.commit();
-	cout << "successfully created databases" << endl;
 }
 
 void TmcData::insertLcd(int id, float x, float y) {
@@ -256,7 +254,7 @@ void TmcData::endGroupEvent(int index, time_t time, int loc, int ext, bool dir) 
 	W.commit();
 }
 
-void TmcData::addGroupEventInfo(int id, int ci, int f1, int f2) {
+void TmcData::addGroupEventInfo(int id, int gsi, int f1, int f2) {
 	if (!C->is_open()) {
 		cout << "Database closed unexpected" << endl;
 		return;
@@ -265,10 +263,10 @@ void TmcData::addGroupEventInfo(int id, int ci, int f1, int f2) {
 		return;
 	}
 
-	string sql = 	"INSERT INTO events_info (id, ci, f1, f2) "
+	string sql = 	"INSERT INTO events_info (id, gsi, f1, f2) "
 					"VALUES ( "
 					"" + to_string(id) + ", "
-					"" + to_string(ci) + ", "
+					"" + to_string(gsi) + ", "
 					"" + to_string(f1) + ", "
 					"" + to_string(f2) + "); ";
 

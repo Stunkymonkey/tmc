@@ -151,13 +151,16 @@ void TmcFilter::processLine(time_t time, std::string line, bool isNew, int index
 				indexes.push_back(0);
 			}
 		}
-	} else if (!dropGFData && ((strs.size() == 9) && ((strs[0].compare("GS")) == 0))) {
+	} else if ((strs.size() == 9) && ((strs[0].compare("GS")) == 0)) {
 		// following group events
 		int ci = stoi(strs[2]);
+		int gsi = stoi(strs[4]);
 		int f1 = stoi(strs[6]);
 		int f2 = stoi(strs[8]);
 		if (isNew) {
-			data->addGroupEventInfo(ci_index.at(ci - 1), ci, f1, f2);
+			if (!dropGFData) {
+				data->addGroupEventInfo(ci_index.at(ci - 1), gsi, f1, f2);
+			}
 			indexes.push_back(0);
 		}
 	} else {
