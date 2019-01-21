@@ -45,21 +45,27 @@ void clean_exit(RDSConnectionHandle hnd)
 
 static void sig_proc(int signr)
 {
-	if (signr == SIGINT) {
+	if (signr == SIGINT){
 		cerr << "Caught SIGINT, ";
-		if (hnd) {
-			cerr << "closing connection, ";
-			rds_close_connection(hnd);
-			rds_delete_connection_object(hnd);
-		}
-		cerr << "exiting." << endl;
-		exit(1);
+	} else if (signr == SIGTERM){
+		cerr << "Caught SIGTERM, ";
+	} else if (signr == SIGQUIT){
+		cerr << "Caught SIGQUIT, ";
 	}
+	if (hnd) {
+		cerr << "closing connection, ";
+		rds_close_connection(hnd);
+		rds_delete_connection_object(hnd);
+	}
+	cerr << "exiting." << endl;
+	exit(1);
 }
 
 int main(int argc, char *argv[])
 {
-	signal(SIGINT, sig_proc);
+	signal(SIGINT,sig_proc);
+	signal(SIGTERM,sig_proc);
+	signal(SIGQUIT,sig_proc);
 
 	TmciOptions opts;
 	if (! opts.ProcessCmdLine(argc, argv)) exit(1);
@@ -81,6 +87,8 @@ int main(int argc, char *argv[])
 		std::string poffset = "./POFFSETS.DAT";
 		std::string eventlist = "./EVENTS.DAT";
 		// data init database
+		data->initDatabase();
+		cout << "successfully created databases" << endl;
 		TmcLCL *lclImporter = new TmcLCL(points, poffset, data);
 		TmcECL *eclImporter = new TmcECL(eventlist, data);
 		lclImporter->readPoints();
