@@ -33,9 +33,8 @@ bool TmcJson::tmc_request(string body, double& northEastLat, double& northEastLn
 		southWestLng = root.get<double>("view.southwest.lng");
 		start_date =  root.get<string>("date.start");
 		end_date =  root.get<string>("date.end");
-		// extracting only time info, because minutes are beeing droppped
-		start_time =  root.get<string>("time.start").substr(0, 2);
-		end_time =  root.get<string>("time.end").substr(0, 2);
+		start_time =  root.get<string>("time.start");
+		end_time =  root.get<string>("time.end");
 	} catch (const boost::property_tree::ptree_bad_path& e) {
 		return false;
 	} catch (...) {
