@@ -27,8 +27,12 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
 	zoom: 11,
 }).addTo(map);
 
+var markerGroup = L.layerGroup().addTo(map);
+var overlayGroup = L.layerGroup().addTo(map);
+
 //request
 function search() {
+	// clean everything
 	document.getElementById("not-found").style.display = "none";
 	document.getElementById("server-down").style.display = "none";
 	markerGroup.clearLayers();
@@ -169,16 +173,15 @@ function getColorFor(str) {
 // }
 
 function overlay() {
-	var xhr_o = new XMLHttpRequest();
-	xhr_o.open("GET", url + "poffsets.json", true);
-	xhr_o.setRequestHeader("Content-type", "application/json");
-	xhr_o.onreadystatechange = function () {
-		if (xhr_o.readyState === 4 && xhr_o.status === 200) {
-			var json = JSON.parse(xhr_o.responseText);
-			DrawOverlayLines(json);
-		}
-	};
-	xhr_o.send();
+	if (isOverlayPointsDrawn && isOverlayLinesDrawn){
+		overlayGroup.clearLayers();
+		isOverlayPointsDrawn = false;
+		isOverlayLinesDrawn = false;
+		console.log("overlay removed");
+		return;
+	}
+	overlay_lines();
+	overlay_points();
 }
 
 function overlay_points() {
@@ -195,7 +198,34 @@ function overlay_points() {
 	};
 	xhr_p.send();
 }
+function DrawOverlayPoints(json) {
+	if (!isOverlayPointsDrawn) {
+		isOverlayPointsDrawn = true;
+		for (var i = 0; i < json.length; i++) {
+			L.circle(json[i][1], {
+				radius: 50,
+				weight: 0.2,
+				color: "#f0027f"
+			}).addTo(overlayGroup).bindPopup("" + json[i][0]);
+		}
+	}
+	console.log("done painting points");
+}
 
+function overlay_lines() {
+	var xhr_o = new XMLHttpRequest();
+	xhr_o.open("GET", url + "poffsets.json", true);
+	xhr_o.setRequestHeader("Content-type", "application/json");
+	xhr_o.onreadystatechange = function () {
+		if (xhr_o.readyState === 4 && xhr_o.status === 200) {
+			var json = JSON.parse(xhr_o.responseText);
+			DrawOverlayLines(json);
+		} else if (xhr.readyState === 4) {
+			document.getElementById("server-down").style.display = "block";
+		}
+	};
+	xhr_o.send();
+}
 function DrawOverlayLines(json) {
 	if (!isOverlayLinesDrawn) {
 		isOverlayLinesDrawn = true;
@@ -203,11 +233,10 @@ function DrawOverlayLines(json) {
 			L.polyline(json[i], {
 				weight: 2,
 				color: "#386cb0"
-			}).addTo(map);
+			}).addTo(overlayGroup);
 		}
 	}
 	console.log("done painting lines");
-	overlay_points();
 }
 
 function hideNotFound() {
