@@ -171,8 +171,10 @@ void TmcFilter::processLine(time_t time, std::string line, bool isNew, int index
 			indexes.push_back(0);
 		}
 	} else {
-		indexes.push_back(0);
-		cerr << "Invalid format: ";
-		printEvent(time, line, isNew, index);
+		if (isNew) {
+			cerr << "Invalid format: ";
+			printEvent(time, line, isNew, index);
+			indexes.push_back(0);
+		}
 	}
 }
