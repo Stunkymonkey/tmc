@@ -1,5 +1,5 @@
 #include <string>
-#include <vector>
+#include <list>
 
 #include "tmcdata.h"
 
@@ -9,7 +9,8 @@ public:
 	~TmcFilter();
 	void addChunk(std::string new_string);
 private:
-	std::vector <std::string> old_strings;
+	std::list<std::string> old_strings;
+	std::list<int> indexes;
 	void printEvent(time_t time, std::string line, bool isNew, int index);
 	void processLine(time_t time, std::string line, bool isNew, int index);
 	TmcData *data;

@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
 		std::istringstream last_chunk(chunk);
 		std::string last_timestamp;
 		std::getline(last_chunk, last_timestamp);
-		last_timestamp += "\nend";
+		last_timestamp += "\n";
 		manager->addChunk(last_timestamp);
 		return 0;
 	}
