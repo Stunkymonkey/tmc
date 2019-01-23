@@ -132,6 +132,18 @@ function createGeoJson(json) {
 					"end": json["events"][i]["end"]
 				},
 				"geometry": {
+					"type": "Point",
+					"coordinates": json["events"][i]["path"][0]
+				}
+			});
+			events.push({
+				"type": "Feature",
+				"properties": {
+					"name": json["events"][i]["event"],
+					"start": json["events"][i]["start"],
+					"end": json["events"][i]["end"]
+				},
+				"geometry": {
 					"type": "LineString",
 					"coordinates": json["events"][i]["path"]
 				}
@@ -162,15 +174,6 @@ function getColorFor(str) {
 	var blu = (hash >>  8) & 0xff;
 	return 'rgb(' + red + ',' + grn + ',' + blu + ')';
 }
-
-// function earthquakeColor(mag) {
-//     return mag > 5 ? '#FE6C00' :
-//            mag > 4  ? '#FCB230' :
-//            mag > 3 ? '#ECC918' :
-//            mag > 2 ? '#FCE46C' :
-//            mag > 1   ? '#F6E488' :
-//                       '#58D68D';
-// }
 
 function overlay() {
 	if (isOverlayPointsDrawn && isOverlayLinesDrawn){
@@ -245,7 +248,6 @@ function hideNotFound() {
 		x.style.display = "none";
 	}
 }
-
 function hideServerDown() {
 	var x = document.getElementById("server-down");
 	if (x.style.display === "block") {
@@ -261,7 +263,7 @@ function dateRange() {
 		if (xhr_p.readyState === 4 && xhr_p.status === 200) {
 			var json = JSON.parse(xhr_p.responseText);
 			setDateRange(json);
-		} else if (xhr.readyState === 4) {
+		} else if (xhr_p.readyState === 4) {
 			document.getElementById("server-down").style.display = "block";
 		}
 	};
