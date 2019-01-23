@@ -36,6 +36,13 @@ function search() {
 	document.getElementById("not-found").style.display = "none";
 	document.getElementById("server-down").style.display = "none";
 	markerGroup.clearLayers();
+
+	if (slider) {
+		var remove_slider = document.getElementsByClassName("leaflet-timeline-control")[0];
+		remove_slider.parentNode.removeChild(remove_slider);
+		slider = null;
+	}
+
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", url + "query", true);
 	xhr.setRequestHeader("Content-type", "application/json");
@@ -80,27 +87,45 @@ function search() {
 	xhr.send(data);
 }
 
-function addGeoJson(data) {
-	timeline = L.timeline(data, {
-		style: function(data){
-			return {
-				// stroke: false,
-				weight: 5,
-				color: getColorFor(data.properties.name),
-				fillOpacity: 0.5
-				}
+function addJson(json) {
+	var select_visual = document.getElementById("visual");
+	var visual = select_visual.options[select_visual.selectedIndex].value;
+
+	if (visual == "timeline") {
+		geodata = createGeoJson(json);
+		timeline = L.timeline(geodata, {
+			style: function(geodata){
+				return {
+					// stroke: false,
+					weight: 5,
+					color: getColorFor(geodata.properties.name),
+					fillOpacity: 0.5
+					}
+				},
+			pointToLayer: function(geoJsonPoint, latlng) {
+					return L.circle(latlng,{
+						radius: 75,
+						weight: 0.2
+					});
 			},
-		pointToLayer: function(geoJsonPoint, latlng) {
-				return L.circle(latlng);
-		},
-		// waitToUpdateMap: true,
-		showTicks : true,
-		onEachFeature: function(feature, layer) {
-			layer.bindTooltip(feature.properties.name);
+			showTicks : true,
+			onEachFeature: function(feature, layer) {
+				layer.bindTooltip(feature.properties.name);
+			}
+		});
+
+		if (!slider) {
+			addTimeLineControl();
+		} else {
+			slider.addTo(map);
 		}
-	});
-	slider.addTimelines(timeline);
-	timeline.addTo(map);
+		slider.addTimelines(timeline);
+		timeline.addTo(markerGroup);
+	} else if (visual == "heatmap") {
+		data = createHeatList(json);
+		console.log(data);
+		var heat = L.heatLayer(data, {radius: 20}).addTo(markerGroup);
+	}
 	console.log("added all events");
 }
 
@@ -153,7 +178,25 @@ function createGeoJson(json) {
 	return {"type": "FeatureCollection", "features": events};
 }
 
+function createHeatList(json) {
+	// console.log("answer: " + JSON.stringify(json));
+	events = []
+	for (var i = 0; i < json["events"].length; i++) {
+		// create heatmap-feature
+		if (json["events"][i]["path"].length == 1) {
+			events.push([json["events"][i]["path"][0][1], json["events"][i]["path"][0][0], 0.2]);
+		} else {
+			for (var j = 0; j < json["events"][i]["path"].length; j++) {
+				events.push([json["events"][i]["path"][j][1], json["events"][i]["path"][j][0], 0.2]);
+			}
+		}
+	}
+	return events;
+}
+
 function addTimeLineControl() {
+	if (slider != null) {
+	}
 	slider = L.timelineSliderControl({
 		formatOutput: function(date) {
 			var result = new Date(date);
@@ -270,8 +313,8 @@ function dateRange() {
 	xhr_p.send();
 }
 function setDateRange(json) {
-	var min = json['min'].split(" ")[0];
-	var max = json['max'].split(" ")[0];
+	var min = json['min'];
+	var max = json['max'];
 	console.log("min: " + min + " max: " + max);
 	document.getElementById("start-date").setAttribute('min', min);
 	document.getElementById("start-date").setAttribute('max', max);
@@ -280,6 +323,4 @@ function setDateRange(json) {
 	document.getElementById("start-date").setAttribute('value', min);
 	document.getElementById("end-date").setAttribute('value', max);
 }
-
 dateRange();
-addTimeLineControl();
