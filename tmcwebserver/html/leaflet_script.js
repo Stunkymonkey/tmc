@@ -35,6 +35,7 @@ function search() {
 	// clean everything
 	document.getElementById("not-found").style.display = "none";
 	document.getElementById("server-down").style.display = "none";
+	document.getElementById("events-found").style.display = "none";
 	markerGroup.clearLayers();
 
 	if (slider) {
@@ -123,8 +124,12 @@ function addJson(json) {
 		timeline.addTo(markerGroup);
 	} else if (visual == "heatmap") {
 		data = createHeatList(json);
-		console.log(data);
+
+		document.getElementById("events-found").style.display = "block";
+		document.getElementById("events-found").innerHTML = "Found " + json.events.length + " events";
+
 		var heat = L.heatLayer(data, {radius: 20}).addTo(markerGroup);
+
 	}
 	console.log("added all events");
 }
@@ -203,6 +208,7 @@ function addTimeLineControl() {
 			return result.toLocaleDateString() + " " + result.toLocaleTimeString();
 		},
 		enableKeyboardControls: true,
+		duration: 20000,
 	});
 	slider.addTo(map);
 }
@@ -293,6 +299,12 @@ function hideNotFound() {
 }
 function hideServerDown() {
 	var x = document.getElementById("server-down");
+	if (x.style.display === "block") {
+		x.style.display = "none";
+	}
+}
+function hideEventsFound() {
+	var x = document.getElementById("events-found");
 	if (x.style.display === "block") {
 		x.style.display = "none";
 	}
