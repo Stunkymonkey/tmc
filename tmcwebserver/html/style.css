@@ -109,40 +109,46 @@ body {
 	background: rgba(255,255,255,0.8);
 }
 
-.time-slider::-moz-focus-outer {
-	border-style: none;
-}
 .time-slider::-webkit-slider-thumb {
 	-webkit-appearance: none;
 	appearance: none;
 	width: 20px;
 	height: 20px;
 	border-radius: 50%;
-	background: #1b1b1b;
+	background: #333333;
 	cursor: pointer;
+}
+.time-slider::-moz-focus-outer {
+	border-style: none;
+}
+.time-slider::-moz-range-track {
+	background-color: #333333;
 }
 .time-slider::-moz-range-thumb {
 	width: 20px;
 	height: 20px;
 	border-radius: 50%;
-	background: #1b1b1b;
+	background: #333333;
 	cursor: pointer;
 	border-style: none;
 	outline: none;
 }
+.time-slider {
+	background-color: transparent;
+}
 
 .toast {
-  min-width: 250px;
-  margin-left: -125px;
-  background-color: #333;
-  color: #fff;
-  text-align: center;
-  border-radius: 2px;
-  padding: 16px;
-  position: fixed;
-  z-index: 1000;
-  left: 50%;
-  bottom: 30px;
+	min-width: 250px;
+	margin-left: -125px;
+	background-color: #333;
+	color: #fff;
+	text-align: center;
+	border-radius: 2px;
+	padding: 16px;
+	position: fixed;
+	z-index: 1000;
+	left: 50%;
+	bottom: 30px;
 }
 
 input[type=number]{
