@@ -44,7 +44,7 @@ bool TmcData::checkConnection() {
 	}
 }
 
-tuple<std::string, std::string> TmcData::minMaxDate() {
+std::tuple<std::string, std::string> TmcData::minMaxDate() {
 	if (!C->is_open()) {
 		cout << "Database closed unexpected" << endl;
 		return make_tuple("", "");
