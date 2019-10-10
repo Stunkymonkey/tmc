@@ -12,21 +12,13 @@ public:
 	int GetPort() { return web_port; }
 	int GetThreads() { return threads; }
 	const string& GetDocRoot() { return doc_root; }
-	const string& GetPsqlHost() { return psql_host; }
-	int GetPsqlPort() { return psql_port; }
-	const string& GetPsqlDatabase() { return psql_database; }
-	const string& GetPsqlUser() { return psql_user; }
-	const string& GetPsqlPassword() { return psql_password; }
+	const string& GetFile() { return file; }
 private:
 	string web_ip;
 	int web_port;
 	int threads;
 	string doc_root;
-	string psql_host;
-	int psql_port;
-	string psql_database;
-	string psql_user;
-	string psql_password;
+	string file;
 	void show_usage();
 	void show_version();
 };

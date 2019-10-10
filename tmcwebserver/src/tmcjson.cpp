@@ -21,16 +21,16 @@ std::string TmcJson::min_max_date(std::string *min, std::string *max) {
 	return oss.str();
 }
 
-bool TmcJson::tmc_request(string body, double& northEastLat, double& northEastLng, double& southWestLat, double& southWestLng, string& start_date, string& end_date, string& start_time, string& end_time) {
+bool TmcJson::tmc_request(string body, float& northEastLat, float& northEastLng, float& southWestLat, float& southWestLng, string& start_date, string& end_date, string& start_time, string& end_time) {
 	std::stringstream ss;
 	pt::ptree root;
 	ss << body;
 	pt::read_json(ss, root);
 	try {
-		northEastLat = root.get<double>("view.northeast.lat");
-		northEastLng = root.get<double>("view.northeast.lng");
-		southWestLat = root.get<double>("view.southwest.lat");
-		southWestLng = root.get<double>("view.southwest.lng");
+		northEastLat = root.get<float>("view.northeast.lat");
+		northEastLng = root.get<float>("view.northeast.lng");
+		southWestLat = root.get<float>("view.southwest.lat");
+		southWestLng = root.get<float>("view.southwest.lng");
 		start_date =  root.get<string>("date.start");
 		end_date =  root.get<string>("date.end");
 		start_time =  root.get<string>("time.start");
@@ -56,19 +56,17 @@ std::string TmcJson::tmc_query(std::vector<struct TmcResult*> out) {
 		event.put("end", tmp->end);
 
 		pt::ptree path;
-		vector<string> strs;
-		// this splits the path into strs by spliting at ',' and ':'
-		boost::split(strs, tmp->path, boost::is_any_of(",:"));
 
-		string longitude;
-		string latitude;
-		for(std::vector<string>::iterator it = strs.begin(); it != strs.end(); ++it) {
+		double longitude;
+		double latitude;
+		for (std::vector<std::pair<double,double>>::iterator i = tmp->path.begin(); i != tmp->path.end(); ++i)
+		{
 			pt::ptree point;
 			pt::ptree cell;
+			std::pair<double,double> tmp_point = *i;
 			// read point
-			longitude = *it;
-			++it;
-			latitude = *it;
+			longitude = get<1>(tmp_point);
+			latitude = get<0>(tmp_point);
 			// save it in point and add it
 			cell.put_value(longitude);
 			point.push_back(std::make_pair("", cell));

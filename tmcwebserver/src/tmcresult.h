@@ -5,7 +5,7 @@ struct TmcResult {
 	std::string event;
 	std::string start;
 	std::string end;
-	std::string path;
+	std::vector<std::pair<double,double>> path;
 };
 
 #endif
