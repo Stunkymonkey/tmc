@@ -60,7 +60,7 @@ void TmcLCL::addPoint(string new_line) {
 	// inserting dots for floats
 	strs.at(22).insert(4,".");
 	strs.at(23).insert(3,".");
-	data->insertLcd(stoi(strs[2]), stof(strs[22]), stof(strs[23]));
+	data->insertLcd(stoi(strs[2]), stof(strs[23]), stof(strs[22]));
 }
 
 void TmcLCL::addOffset(string new_line) {

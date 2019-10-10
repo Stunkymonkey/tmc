@@ -1,276 +1,199 @@
 #include <iostream>
-
 #include "tmcdata.h"
 
 using namespace std;
-using namespace pqxx;
 
-TmcData::TmcData(string db_name, string user, string password, string hostaddr, string port) {
-	dbConfig = "dbname = " + db_name + " user = " + user;
-	// password not set
-	if (password != "") {
-		dbConfig = dbConfig + " password = " + password;
-	}
-	dbConfig = dbConfig + " hostaddr = " + hostaddr + " port = " + port;
-
-	try {
-		C = new pqxx::connection(dbConfig);
-	} catch (const std::exception &e) {
-		cerr << e.what() << std::endl;
-		exit(1);
-	}
-	if (C->is_open()) {
-		cout << "Opened database successfully: " << C->dbname() << endl;
-	}
+void TmcData::init() {
+	int grid_size = grid_size_x * grid_size_y;
+	lcd_x = vector<float>(pow(2, 16));
+	lcd_y = vector<float>(pow(2, 16));
+	offset_pos = vector<uint16_t>(pow(2, 16));
+	offset_neg = vector<uint16_t>(pow(2, 16));
+	event_desc = vector<string>(pow(2, 11));
+	grid = vector<vector<long>>(grid_size);
+	grid_ids = std::vector<int>(pow(2, 16));
+	hour_index = vector<vector<vector<pair<long,int>>>>(pow(2, 16),vector<vector<pair<long,int>> >(24,vector <pair<long,int>>(0)));
 }
 
-TmcData::~TmcData()
-{
-	C->disconnect();
-	free(C);
-}
-
-bool TmcData::checkConnection() {
-	try {
-		if (C->is_open()) {
-			return true;
+void TmcData::generateGrid() {
+	x_range = lcd_x_max - lcd_x_min;
+	y_range = lcd_y_max - lcd_y_min;
+	for (int i = 0; i < lcd_x.size(); ++i)
+	{
+		float x = lcd_x[i];
+		float y = lcd_y[i];
+		if (x != 0.0f && y != 0.0f) {
+			grid_ids.at(i) = getGridIndex(getXIndex(x), getYIndex(y));
 		} else {
-			return false;
+			grid_ids.at(i) = -1;
 		}
-	} catch (const std::exception &e) {
-		cerr << e.what() << std::endl;
-		return false;
 	}
 }
 
-void TmcData::initDatabase() {
-	if (!C->is_open()) {
-		cout << "Database closed unexpected" << endl;
-		return;
-	}
-	string postgis = "CREATE EXTENSION IF NOT EXISTS postgis;";
+int TmcData::getGridIndex(int x, int y) {
+	return y * grid_size_x + x;
+}
 
-	string points = 	"CREATE TABLE IF NOT EXISTS points ("
-							"id SERIAL UNIQUE PRIMARY KEY,"
-							"point GEOMETRY"
-						");";
-	string points_index = "CREATE INDEX IF NOT EXISTS areas_points ON points USING GIST (point);";
+int TmcData::getXIndex(float x) {
+	float percent = (x - lcd_x_min) / x_range;
+	return (percent * grid_size_x) - 1;
+}
 
-	string events = 	"CREATE TABLE IF NOT EXISTS events ("
-							"id bigserial UNIQUE PRIMARY KEY,"
-							"\"start\" TIMESTAMP,"
-							"\"end\" TIMESTAMP,"
-							//"\"end\" TIMESTAMP, CHECK (\"start\" <= \"end\"),"
-							"lcd SERIAL,"
-							"event SERIAL,"
-							"extension SERIAL,"
-							"dir_negative BOOLEAN"
-						");";
-	string time_index = "CREATE INDEX IF NOT EXISTS time_index ON events (start, \"end\");";
-	string events_info = 	"CREATE TABLE events_info ("
-								"id bigserial,"
-								"gsi SERIAL,"
-								"f1 SERIAL,"
-								"f2 SERIAL"
-							");";
-
-	string poffset = 	"CREATE TABLE IF NOT EXISTS point_offset ("
-							"lcd SERIAL UNIQUE PRIMARY KEY,"
-							"positive SERIAL,"
-							"negative SERIAL"
-						");";
-
-	string event_type = "CREATE TABLE  IF NOT EXISTS event_type ("
-							"id SERIAL UNIQUE PRIMARY KEY ,"
-							"description VARCHAR(200)"
-						");";
-
-	string get_path = 	"CREATE OR REPLACE FUNCTION get_path(INTEGER, INTEGER, BOOLEAN)"
-						"RETURNS TEXT AS $path$"
-						"	DECLARE"
-						"		tmp_lcd ALIAS FOR $1;"
-						"		extension ALIAS FOR $2;"
-						"		dir_negative ALIAS FOR $3;"
-						"		result TEXT;"
-						"	BEGIN"
-						"		SELECT CONCAT(ST_X(points.point), ':' , ST_Y(points.point)) INTO result FROM points WHERE points.id = tmp_lcd;"	
-						"		WHILE (0 < extension)"
-						"		LOOP"
-						"			IF dir_negative THEN"
-						"				SELECT negative INTO tmp_lcd FROM point_offset WHERE point_offset.lcd = tmp_lcd;"	
-						"			ELSE"
-						"				SELECT positive INTO tmp_lcd FROM point_offset WHERE point_offset.lcd = tmp_lcd;"	
-						"			END IF;"
-						"			IF tmp_lcd = 0 THEN"
-						"				EXIT;"
-						"			END IF;"
-						"			SELECT CONCAT(result, ',' , ST_X(points.point), ':' , ST_Y(points.point)) INTO result FROM points WHERE points.id = tmp_lcd;"	
-						"			extension = extension - 1;"
-						"		END LOOP;"
-						"		RETURN result;"
-						"	END;"
-						"	$path$"
-						"LANGUAGE plpgsql;";
-
-	work W(*C);
-	W.exec( postgis );
-	W.exec( points );
-	W.exec( points_index );
-	W.exec( events );
-	W.exec( time_index );
-	W.exec( events_info );
-	W.exec( poffset );
-	W.exec( event_type );
-	W.exec( get_path );
-	W.commit();
+int TmcData::getYIndex(float y) {
+	float percent = (y - lcd_y_min) / y_range;
+	return (percent * grid_size_y) - 1;
 }
 
 void TmcData::insertLcd(int id, float x, float y) {
-	if (!C->is_open()) {
-		cout << "Database closed unexpected" << endl;
-		return;
+	lcd_x.at(id) = x;
+	if (x < lcd_x_min) {
+		lcd_x_min = x;
+	} else if (x > lcd_x_max) {
+		lcd_x_max = x;
 	}
-
-	string sql = 	"INSERT INTO points (id, point) "
-					"VALUES ( "
-					"" + to_string(id) + ", "
-					"ST_Point(" + to_string(x) + "," + to_string(y) + "))"
-					"ON CONFLICT DO NOTHING;";
-
-	work W(*C);
-	W.exec( sql );
-	W.commit();
+	lcd_y.at(id) = y;
+	if (y < lcd_y_min) {
+		lcd_y_min = y;
+	} else if (y > lcd_y_max) {
+		lcd_y_max = y;
+	}
+	return;
 }
 
 void TmcData::insertOffset(int lcd, int neg, int pos) {
-	if (!C->is_open()) {
-		cout << "Database closed unexpected" << endl;
-		return;
-	}
-
-	string sql = 	"INSERT INTO point_offset (lcd, negative, positive) "
-					"VALUES ( "
-					"" + to_string(lcd) + ", "
-					"" + to_string(neg) + ", "
-					"" + to_string(pos) + ")"
-					"ON CONFLICT DO NOTHING;";
-	work W(*C);
-	W.exec( sql );
-	W.commit();
+	offset_neg.at(lcd) = neg;
+	offset_pos.at(lcd) = pos;
 }
 
 void TmcData::insertEventType(int eventcode, string desc) {
-	if (!C->is_open()) {
-		cout << "Database closed unexpected" << endl;
-		return;
+	event_desc.at(eventcode) = desc;
+}
+
+void TmcData::updateMinMaxDate(time_t time) {
+	if (time < min_date) {
+		min_date = time;
+	} else if (time > max_date) {
+		max_date = time;
 	}
-
-	string sql = 	"INSERT INTO event_type (id, description) "
-					"VALUES ( "
-					"" + to_string(eventcode) + ", "
-					"" + desc + ")"
-					"ON CONFLICT DO NOTHING;";
-
-	work W(*C);
-	W.exec( sql );
-	W.commit();
 }
 
 int TmcData::startSingleEvent(time_t time, int loc, int event, int ext, bool dir) {
-	if (!C->is_open()) {
-		cout << "Database closed unexpected" << endl;
-		return 0;
+	long index = event_lcd.size();
+	int grid_id = grid_ids.at(loc);
+	// check if location code is defined
+	if (grid_id == -1) {
+		return -1;
 	}
-	string sql =	"INSERT INTO events (\"start\", \"end\", lcd, event, extension, dir_negative) "
-					"SELECT "
-					"to_timestamp(" + to_string(time) + "), "
-					"NULL, "
-					"" + to_string(loc) + ", "
-					"" + to_string(event) + ", "
-					"" + to_string(ext) + ", "
-					"" + to_string(dir) + "::BOOLEAN "
-					"RETURNING id;";
-
-	//cout << sql << endl;
-
-	nontransaction N(*C);
-	result R( N.exec( sql ));
-
-	// no need to iterate over result, because it only has one line
-	return R.begin()[0].as<int>();
+	vector<long> cell = grid.at(grid_id);
+	vector<long>::iterator begin, end;
+	begin = events_lower_bound(cell.begin(), cell.end(), time);
+	end = events_upper_bound(cell.begin(), cell.end(), time);
+	if (isEventExistent(begin, end, time, loc, event, ext, dir) && !add_duplicate_events) {
+		cout << "warning event already imported. skipping" << endl;
+		return -1;
+	}
+	event_start.push_back(time);
+	event_end.push_back(-1);
+	event_lcd.push_back(loc);
+	event_type.push_back(event);
+	event_extension.push_back(ext);
+	event_dir_negative.push_back(dir);
+	// add to correct time index
+	cell.insert(end, index);
+	grid.at(grid_id) = cell;
+	updateMinMaxDate(time);
+	return index;
 }
 
 void TmcData::endSingleEvent(int index, time_t time, int loc, int ext, bool dir) {
-	if (!C->is_open()) {
-		cout << "Database closed unexpected" << endl;
+	// it has been ended before
+	// TODO: the if should be removed : fix in tmcfilter
+	if (index == -1) { 
 		return;
 	}
-
-	string sql = 	"UPDATE events "
-					"SET \"end\" = to_timestamp(" + to_string(time) + ") "
-					"WHERE \"end\" IS NULL AND id = " + to_string(index) + ";";
-	
-	work W(*C);
-	W.exec( sql );
-	W.commit();
+	if (event_end.at(index) == -1) {
+		event_end.at(index) = time;
+		updateMinMaxDate(time);
+	}
 }
 
 int TmcData::startGroupEvent(time_t time, int loc, int event, int ext, bool dir) {
-	// return id of event, because it is needed for additional group infos
-	if (!C->is_open()) {
-		cout << "Database closed unexpected" << endl;
-		return 0;
+	// return id of event, because it is needed for additional group infos and end
+	int event_id = startSingleEvent(time, loc, event, ext, dir);
+	if (event_id == -1) {
+		return -1;
 	}
-
-	string sql =	"INSERT INTO events (\"start\", \"end\", lcd, event, extension, dir_negative) "
-					"SELECT "
-					"to_timestamp(" + to_string(time) + "), "
-					"NULL, "
-					"" + to_string(loc) + ", "
-					"" + to_string(event) + ", "
-					"" + to_string(ext) + ", "
-					"" + to_string(dir) + "::BOOLEAN "
-					"RETURNING id;";
-
-	nontransaction N(*C);
-	result R( N.exec( sql ));
-
-	// no need to iterate over result, because it only has one line
-	return R.begin()[0].as<int>();
+	additional_event_info.resize(event_id + 1);
+	std::vector<uint16_t> additional_info(0);
+	additional_event_info.at(event_id) = additional_info;
+	return event_id;
 }
 
 void TmcData::endGroupEvent(int index, time_t time, int loc, int ext, bool dir) {
-	if (!C->is_open()) {
-		cout << "Database closed unexpected" << endl;
-		return;
-	}
-
-	string sql = 	"UPDATE events "
-					"SET \"end\" = to_timestamp(" + to_string(time) + ") "
-					"WHERE \"end\" IS NULL AND id = " + to_string(index) + ";";
-
-	work W(*C);
-	W.exec( sql );
-	W.commit();
+	endSingleEvent(index, time, loc, ext, dir);
 }
 
 void TmcData::addGroupEventInfo(int id, int gsi, int f1, int f2) {
-	if (!C->is_open()) {
-		cout << "Database closed unexpected" << endl;
+	if (id == -1) {
 		return;
 	}
-	if (id == 0) {
-		return;
+	//additional_event_info.at(id).push_back(gsi);
+	additional_event_info.at(id).push_back(f1);
+	additional_event_info.at(id).push_back(f2);
+}
+
+bool TmcData::isEventExistent(vector<long>::iterator begin, vector<long>::iterator end, time_t time, int loc, int event, int ext, bool dir) {
+	// check if event is already in system
+	for (; begin != end; ++begin) {
+		if (loc == event_lcd.at(*begin) && event == event_type.at(*begin) && ext == event_extension.at(*begin) && dir == event_dir_negative.at(*begin)) {
+			return true;
+		}
 	}
+	return false;
+}
 
-	string sql = 	"INSERT INTO events_info (id, gsi, f1, f2) "
-					"VALUES ( "
-					"" + to_string(id) + ", "
-					"" + to_string(gsi) + ", "
-					"" + to_string(f1) + ", "
-					"" + to_string(f2) + "); ";
+void TmcData::generateHourIndex() {
+	// iterate all cells
+	// iterate all events
+	// get hour
+	// then check last item if index + offset == new_index -1
+	// if yes increase offset by one
+	// else add new pair with size 1 to the vector
+}
 
-	work W(*C);
-	W.exec( sql );
-	W.commit();
+vector<long>::iterator TmcData::events_upper_bound (std::vector<long>::iterator first, std::vector<long>::iterator last, const long& val)
+{
+	vector<long>::iterator it;
+	iterator_traits<std::vector<long>::iterator>::difference_type count, step;
+	count = distance(first, last);
+	while (count > 0)
+	{
+		it = first;
+		step = count / 2;
+		advance (it, step);
+		if (!(val < event_start.at(*it))) {
+			first = ++it; count -= step + 1;
+		}
+		else count = step;
+	}
+	return first;
+}
+
+vector<long>::iterator TmcData::events_lower_bound (std::vector<long>::iterator first, std::vector<long>::iterator last, const long& val)
+{
+	std::vector<long>::iterator it;
+	iterator_traits<std::vector<long>::iterator>::difference_type count, step;
+	count = distance(first, last);
+	while (count > 0)
+	{
+		it = first;
+		step = count / 2;
+		advance (it, step);
+		if (event_start.at(*it) < val) {
+			first = ++it;
+			count -= step + 1;
+		}
+		else count = step;
+	}
+	return first;
 }

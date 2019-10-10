@@ -38,7 +38,7 @@ void TmcFilter::addChunk(string new_string) {
 		string time_str = header.substr(5, 19);
 		struct tm tm = { 0 };
 		if (strptime(time_str.c_str(), "%FT%T", &tm)) {
-			rawtime = mktime(&tm);
+			rawtime = timegm(&tm);
 		} else {
 			cout << "strptime failed" << endl;
 		}
@@ -77,7 +77,7 @@ void TmcFilter::addChunk(string new_string) {
 	// if tok_iter is at end all old_strings have to be ended
 	while (tok_iter != tokens.end()) {
 		// new lines
-		processLine(rawtime, *tok_iter, true, 0);
+		processLine(rawtime, *tok_iter, true, -1);
 		old_strings.push_back(*tok_iter);
 		tok_iter++;
 	}
@@ -104,7 +104,7 @@ void TmcFilter::processLine(time_t time, std::string line, bool isNew, int index
 	// T is an encrypted message
 	if (line.front() == 'Y' || line.front() == 'T') {
 		if (isNew) {
-			indexes.push_back(0);
+			indexes.push_back(-1);
 		}
 		return;
 	}
@@ -131,8 +131,11 @@ void TmcFilter::processLine(time_t time, std::string line, bool isNew, int index
 		} else {
 			// event type is canceling
 			if (isNew) {
+	// if line is new at bottom and has never be seen before and cancles out an event.
+	// refference to event it cancels should be used and passed, instead always a dummy -1 is passed which makes the data unusable
+	// unsure how to fix
 				data->endSingleEvent(index, time, loc, ext, dir);
-				indexes.push_back(0);
+				indexes.push_back(-1);
 			}
 		}
 		
@@ -155,7 +158,7 @@ void TmcFilter::processLine(time_t time, std::string line, bool isNew, int index
 		} else {
 			if (isNew) {
 				data->endGroupEvent(index, time, loc, ext, dir);
-				indexes.push_back(0);
+				indexes.push_back(-1);
 			}
 		}
 	} else if ((strs.size() == 9) && ((strs[0].compare("GS")) == 0)) {
@@ -168,13 +171,13 @@ void TmcFilter::processLine(time_t time, std::string line, bool isNew, int index
 			if (!dropGFData) {
 				data->addGroupEventInfo(ci_index.at(ci - 1), gsi, f1, f2);
 			}
-			indexes.push_back(0);
+			indexes.push_back(-1);
 		}
 	} else {
 		if (isNew) {
 			cerr << "Invalid format: ";
 			printEvent(time, line, isNew, index);
-			indexes.push_back(0);
+			indexes.push_back(-1);
 		}
 	}
 }

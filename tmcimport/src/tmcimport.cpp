@@ -10,6 +10,9 @@
 #include <sstream>
 #include <stdio.h>
 
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+
 #include "tmcioptions.h"
 #include "tmcqueryhandler.h"
 #include "tmcreader.h"
@@ -70,28 +73,27 @@ int main(int argc, char *argv[])
 	TmciOptions opts;
 	if (! opts.ProcessCmdLine(argc, argv)) exit(1);
 
+	TmcData *data = new TmcData();
+	// ratio: north south 876km / west east 640 km = 100:136
+	data->setGridSize(100, 136);
 
-	string psql_host = opts.GetPsqlHost();
-	int psql_port = opts.GetPsqlPort();
-	string psql_user = opts.GetPsqlUser();
-	string psql_password = opts.GetPsqlPassword();
-	string psql_database = opts.GetPsqlDatabase();
+	string data_file = opts.GetDataFile();
 
-	TmcData *data = new TmcData(psql_database, psql_user, psql_password, psql_host, std::to_string(psql_port));
-	if (!data->checkConnection()) {
-		return 42;
-	}
-
-	if (opts.GetInitState()) {
+	ifstream ifs(data_file);
+    if (ifs.good()) {
+		boost::archive::binary_iarchive iar(ifs);
+		iar >> data;
+		cout << "read " << data_file << endl;
+	} else {
 		std::string points = "./POINTS.DAT";
 		std::string poffset = "./POFFSETS.DAT";
 		std::string eventlist = "./EVENTS.DAT";
-		// data init database
-		data->initDatabase();
-		cout << "successfully created databases" << endl;
+		// read lcl data
+		data->init();
 		TmcLCL *lclImporter = new TmcLCL(points, poffset, data);
 		TmcECL *eclImporter = new TmcECL(eventlist, data);
 		lclImporter->readPoints();
+		data->generateGrid();
 		cout << "Successfully imported " << points;
 		lclImporter->readOffsets();
 		cout << " & " << poffset;
@@ -99,12 +101,13 @@ int main(int argc, char *argv[])
 		cout << " & " << eventlist << endl;
 		delete lclImporter;
 		delete eclImporter;
-		return 0;
 	}
+	data->AddDuplicateEvents(opts.AddDuplicateEvents());
 
 	TmcFilter *manager = new TmcFilter(data, opts.DropGFData());
 
 	string file_name = opts.GetFileName();
+
 	// if filename is given import file else use rds-device
 	if (file_name != "") {
 		TmcReader *reader = new TmcReader(file_name);
@@ -119,11 +122,18 @@ int main(int argc, char *argv[])
 		delete reader;
 
 		// if there are events unfinished, this will end them.
-		std::istringstream last_chunk(chunk);
-		std::string last_timestamp;
-		std::getline(last_chunk, last_timestamp);
+		istringstream last_chunk(chunk);
+		string last_timestamp;
+		getline(last_chunk, last_timestamp);
 		last_timestamp += "\n";
 		manager->addChunk(last_timestamp);
+		
+		data->generateHourIndex();
+
+		ofstream ofs(data_file);
+		boost::archive::binary_oarchive oar(ofs);
+		oar << data;
+		cout << "exported to " << data_file << endl;
 		return 0;
 	}
 

@@ -40,6 +40,7 @@ poffsets.json
 tmclog/src/tmclog
 tmcimport/src/tmcimport
 tmcwebserver/src/tmcwebserver
+*.tmcd
 
 # spooky build artefact
 stamp-h1

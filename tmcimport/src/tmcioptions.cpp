@@ -21,13 +21,9 @@ TmciOptions::TmciOptions():
 	source_num(0),
 	event_mask(RDS_EVENT_TMC),
 	file_name(""),
-	init(false),
+	data_file("store.tmcd"),
 	drop_additional_data(false),
-	psql_host("127.0.0.1"),
-	psql_port(5432),
-	psql_database("tmc"),
-	psql_user("tmc"),
-	psql_password("")
+	add_duplicate_events(false)
 {
 }
 
@@ -48,13 +44,9 @@ bool TmciOptions::ProcessCmdLine(int argc, char *argv[])
 			("port,p", po::value<int>(), "TCP/IP port where rdsd is listening")
 			("unix-socket,u", po::value<string>(), "Socket where rdsd is listening")
 			("filename,f", po::value<string>(), "specify file name to read from")
-			("initialize,i", "for initializing the databases")
-			("dropgf,d", "drop additional event data for using less space")
-			("postgresql-server,S", po::value<string>()->default_value("127.0.0.1"), "IP of PostgreSQL-server")
-			("postgresql-port,P", po::value<int>()->default_value(5432), "Port of PostgreSQL")
-			("postgresql-database,D", po::value<string>()->default_value("tmc"), "PostgreSQL database-name")
-			("postgresql-user,U", po::value<string>()->default_value("tmc"), "PostgreSQL-User")
-			("postgresql-password,K", po::value<string>()->default_value(""), "Password of PostgreSQL-User");
+			("datafile,d", po::value<string>(), "specify file to read from and save to")
+			("add-duplicate-events,a", "forcing duplicate events to be added")
+			("dropgf,d", "drop additional event data for using less space");
 
 		po::variables_map vm;
 		po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -86,24 +78,12 @@ bool TmciOptions::ProcessCmdLine(int argc, char *argv[])
 		if (vm.count("filename")) {
 			file_name = vm["filename"].as<string>();
 		}
-		init = vm.count("initialize");
+		if (vm.count("datafile"))
+		{
+			data_file = vm["datafile"].as<string>();
+		}
 		drop_additional_data = vm.count("dropgf");
-
-		if (vm.count("postgre-server")) {
-			psql_host = vm["postgre-server"].as<string>();
-		}
-		if (vm.count("postgre-port")) {
-			psql_port = vm["postgre-port"].as<int>();
-		}
-		if (vm.count("postgre-database")) {
-			psql_database = vm["postgre-database"].as<string>();
-		}
-		if (vm.count("postgre-user")) {
-			psql_user = vm["postgre-user"].as<string>();
-		}
-		if (vm.count("postgre-password")) {
-			psql_password = vm["postgre-password"].as<string>();
-		}
+		add_duplicate_events = vm.count("add-duplicate-events");
 
 	} catch (const po::error &ex) {
 		cerr << ex.what() << endl;

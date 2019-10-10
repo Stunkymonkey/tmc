@@ -15,13 +15,9 @@ public:
 	int GetSourceNum() { return source_num; }
 	rds_events_t GetEventMask() { return event_mask; }
 	const string& GetFileName() { return file_name; }
-	const bool& GetInitState() { return init; }
+	const string& GetDataFile() { return data_file; }
 	const bool& DropGFData() { return drop_additional_data; }
-	const string& GetPsqlHost() { return psql_host; }
-	int GetPsqlPort() { return psql_port; }
-	const string& GetPsqlDatabase() { return psql_database; }
-	const string& GetPsqlUser() { return psql_user; }
-	const string& GetPsqlPassword() { return psql_password; }
+	const bool& AddDuplicateEvents() { return add_duplicate_events; }
 private:
 	int conn_type;
 	string server_name;
@@ -29,12 +25,9 @@ private:
 	int source_num;
 	rds_events_t event_mask;
 	string file_name;
+	string data_file;
 	bool init;
 	bool drop_additional_data;
-	string psql_host;
-	int psql_port;
-	string psql_database;
-	string psql_user;
-	string psql_password;
+	bool add_duplicate_events;
 	void show_version();
 };

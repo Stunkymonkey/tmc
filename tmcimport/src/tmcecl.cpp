@@ -43,7 +43,7 @@ void TmcECL::addEventType(string new_line) {
 
 	// some lines do not have an event code. ignoring them by checking if exists
 	if (strs[6] != "") {
-		replace( strs[3].begin(), strs[3].end(), '"', '\'');
+		strs[3].erase(remove(strs[3].begin(), strs[3].end(), '"'), strs[3].end());
 		data->insertEventType(stoi(strs[6]), strs[3]);
 	}
 }
