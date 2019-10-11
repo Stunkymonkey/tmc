@@ -12,7 +12,6 @@ void TmcData::init() {
 	event_desc = vector<string>(pow(2, 11));
 	grid = vector<vector<long>>(grid_size);
 	grid_ids = std::vector<int>(pow(2, 16));
-	hour_index = vector<vector<vector<pair<long,int>>>>(pow(2, 16),vector<vector<pair<long,int>> >(24,vector <pair<long,int>>(0)));
 }
 
 void TmcData::generateGrid() {
@@ -153,12 +152,30 @@ bool TmcData::isEventExistent(vector<long>::iterator begin, vector<long>::iterat
 }
 
 void TmcData::generateHourIndex() {
-	// iterate all cells
-	// iterate all events
-	// get hour
-	// then check last item if index + offset == new_index -1
-	// if yes increase offset by one
-	// else add new pair with size 1 to the vector
+	hour_index = vector<vector<vector<pair<long,int>>>>(pow(2, 16),vector<vector<pair<long,int>> >(24,vector <pair<long,int>>(0)));
+	for (vector<vector<long>>::iterator cell = grid.begin(); cell != grid.end(); ++cell) {
+		size_t grid_index = distance(grid.begin(), cell);
+		for (std::vector<long>::iterator i = cell->begin(); i != cell->end(); ++i) {
+			size_t new_index = distance(cell->begin(), i);
+			int hour = getHour(event_start.at(*i));
+			if (hour_index.at(grid_index).at(hour).size() == 0) {
+				hour_index.at(grid_index).at(hour).push_back(make_pair(new_index,0));
+				continue;
+			}
+			pair<long,int> last_element = hour_index.at(grid_index).at(hour).back();
+			if (last_element.first + last_element.second + 1 == new_index) {
+				hour_index.at(grid_index).at(hour).back().second += 1;
+			} else {
+				hour_index.at(grid_index).at(hour).push_back(make_pair(new_index,0));
+			}
+		}
+	}
+}
+
+int TmcData::getHour(time_t time) {
+	struct tm *timeinfo;
+	timeinfo = gmtime(&time);
+	return timeinfo->tm_hour;
 }
 
 vector<long>::iterator TmcData::events_upper_bound (std::vector<long>::iterator first, std::vector<long>::iterator last, const long& val)

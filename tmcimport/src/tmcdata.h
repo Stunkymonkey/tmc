@@ -72,6 +72,7 @@ private:
 	std::vector<long>::iterator events_upper_bound (std::vector<long>::iterator first, std::vector<long>::iterator last, const long& val);
 	std::vector<long>::iterator events_lower_bound (std::vector<long>::iterator first, std::vector<long>::iterator last, const long& val);
 	bool isEventExistent(std::vector<long>::iterator begin, std::vector<long>::iterator end, time_t time, int loc, int event, int ext, bool dir);
+	int getHour(time_t time);
 
 	bool add_duplicate_events;
 

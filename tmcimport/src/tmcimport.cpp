@@ -127,7 +127,8 @@ int main(int argc, char *argv[])
 		getline(last_chunk, last_timestamp);
 		last_timestamp += "\n";
 		manager->addChunk(last_timestamp);
-		
+
+		cout << "generating index" << endl;
 		data->generateHourIndex();
 
 		ofstream ofs(data_file);
