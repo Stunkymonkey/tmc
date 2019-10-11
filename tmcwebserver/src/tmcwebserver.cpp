@@ -17,6 +17,7 @@
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/version.hpp>
+#include <boost/asio/dispatch.hpp>
 #include <boost/asio/strand.hpp>
 #include <boost/config.hpp>
 #include <algorithm>
@@ -34,10 +35,10 @@
 #include "tmcresult.h"
 #include "tmcwoptions.h"
 
-namespace beast = boost::beast;		 // from <boost/beast.hpp>
-namespace http = beast::http;		   // from <boost/beast/http.hpp>
-namespace net = boost::asio;			// from <boost/asio.hpp>
-using tcp = boost::asio::ip::tcp;	   // from <boost/asio/ip/tcp.hpp>
+namespace beast = boost::beast;	// from <boost/beast.hpp>
+namespace http = beast::http;		// from <boost/beast/http.hpp>
+namespace net = boost::asio;		// from <boost/asio.hpp>
+using tcp = boost::asio::ip::tcp;	// from <boost/asio/ip/tcp.hpp>
 TmcData *data;
 
 
@@ -60,6 +61,7 @@ mime_type(beast::string_view path)
 	if(iequals(ext, ".js"))   return "application/javascript";
 	if(iequals(ext, ".json")) return "application/json";
 	if(iequals(ext, ".png"))  return "image/png";
+	if(iequals(ext, ".jpe"))  return "image/jpeg";
 	if(iequals(ext, ".jpeg")) return "image/jpeg";
 	if(iequals(ext, ".jpg"))  return "image/jpeg";
 	if(iequals(ext, ".svg"))  return "image/svg+xml";
@@ -336,7 +338,14 @@ public:
 	void
 	run()
 	{
-		do_read();
+		// We need to be executing within a strand to perform async operations
+		// on the I/O objects in this session. Although not strictly necessary
+		// for single-threaded contexts, this example code is written to be
+		// thread-safe by default.
+		net::dispatch(stream_.get_executor(),
+					  beast::bind_front_handler(
+						  &session::do_read,
+						  shared_from_this()));
 	}
 
 	void

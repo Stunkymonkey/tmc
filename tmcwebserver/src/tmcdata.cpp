@@ -22,14 +22,14 @@ std::tuple<std::string, std::string> TmcData::minMaxDate() {
 }
 
 void TmcData::query(std::vector<struct TmcResult*>& out,
-                    float northEastLat,
-                    float northEastLng,
-                    float southWestLat,
-                    float southWestLng,
-                    string start_date,
-                    string end_date,
-                    string start_time,
-                    string end_time) {
+					float northEastLat,
+					float northEastLng,
+					float southWestLat,
+					float southWestLng,
+					string start_date,
+					string end_date,
+					string start_time,
+					string end_time) {
 
 	time_t t_start_date = getDate(start_date, false);
 	time_t t_end_date = getDate(end_date, true);
@@ -108,20 +108,39 @@ int TmcData::getYIndex(float y) {
 	return (percent * grid_size_y) - 1;
 }
 
-vector<long> TmcData::getEventsOfIndex(time_t start_date, time_t end_date, int start_time, int end_time, int i) {
-	vector<long> cell = grid.at(i);
+vector<long> TmcData::getEventsOfIndex(time_t start_date, time_t end_date, int start_time, int end_time, int grid_id) {
+	vector<long> cell = grid.at(grid_id);
 	vector<long>::iterator begin, end;
-
 
 	begin = events_upper_bound(cell.begin(), cell.end(), start_date);
 	end = events_lower_bound(cell.begin(), cell.end(), end_date);
 
-	// if no time is specified
+	// if no hour is selected
 	if (start_time == end_time){
 		return vector<long>(begin, end);
 	} else {
-		// else only specific indices
-		return vector<long>(0);
+		// else only specific hours
+		vector<long> result(0);
+		vector<vector<pair<long,int>>> hours = hour_index.at(grid_id);
+		// iterate over all wanted hours
+		for (int hour = start_time; hour != end_time; hour = (hour + 1) % 24) {
+			vector<pair<long,int>> tmp = hours.at(hour);
+			// search for intervall in hour_index which should be used
+			long cell_index_begin = distance(cell.begin(), begin);
+			long cell_index_end = distance(cell.begin(), end);
+			vector<pair<long,int>>::iterator hour_begin, hour_end;
+			auto compare = [](const pair<long,int> &l, const pair<long,int> &r)->bool{ return l.first <= r.first; };
+			hour_begin = upper_bound(tmp.begin(), tmp.end(), make_pair(cell_index_begin, 0), compare);
+			hour_end = lower_bound(tmp.begin(), tmp.end(), make_pair(cell_index_end, 0), compare);
+
+			// append all events based on the hour index
+			for (vector<pair<long,int>>::iterator i = hour_begin; i != hour_end; ++i)
+			{
+				vector<long>::iterator first_event = cell.begin() + i->first;
+				result.insert(result.end(), first_event, first_event + i->second);
+			}
+		}
+		return result;
 	}
 	
 }
